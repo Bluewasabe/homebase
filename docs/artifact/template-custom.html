@@ -64,7 +64,7 @@
   <header>
     <div class="eyebrow">homebase · from-scratch variants · built 2026-09-15 · hub 192.168.1.141</div>
     <h1>Homebase Custom Three</h1>
-    <p class="lede">Three front doors written from a blank file, each borrowing its whole visual language from something in your world instead of from a dashboard product. All three are live on hub right now, reading the same feed, Uptime Kuma, Proxmox and Plex as the stock variants, plus a new sidecar that does a real Minecraft and Bedrock handshake for player counts. Every screenshot is the real page.</p>
+    <p class="lede">Three front doors written from a blank file, each borrowing its whole visual language from something in your world instead of from a dashboard product. Flight Deck was replaced by JARVIS on request. All three are live on hub right now, reading the same feed, Uptime Kuma, Proxmox and Plex as the stock variants, plus a new sidecar that does a real Minecraft and Bedrock handshake for player counts. Every screenshot is the real page.</p>
   </header>
 
   <section>
@@ -88,17 +88,17 @@
     <h2>The three</h2>
 
     <article class="variant">
-      <div class="head"><h3>Flight Deck</h3><span class="port">:3301</span><span class="pill">annunciator panel · engine gauges · nav scope</span></div>
-      <p class="thesis">An aircraft caution panel is the best "is anything wrong" display ever designed: a grid of lettered tiles that stay dark until they matter. Here MASTER CAUTION and MASTER WARNING sit at the top, with DISK LOW, CTR UNHEALTHY, PORT CLOSED, GAME OFFLINE, MONITOR DOWN, FEED STALE, and two green advisories for PLEX ACTIVE and PLAYERS ON. Under it, every host is an engine cluster with three round gauges drawn on canvas, red arcs where the limits are. The nav scope puts each service as a blip: sector is the machine, ring is the function, and you click a blip to open it.</p>
+      <div class="head"><h3>JARVIS</h3><span class="port">:3301</span><span class="pill">arc reactor · briefing · holographic tiles</span></div>
+      <p class="thesis">Stark's assistant, but every element is data. JARVIS opens by telling you the state in a sentence: "Good evening, sir. All 6 machines are responding. 54 of 58 monitors are green; BlueRig (ping) and File Browser are not. bettermc-mc reports unhealthy on Server-Rig. PlexBoy's C: 8% free, I would address that soon." The arc reactor in the middle is the fleet: the core reads OK / WARN / CRIT, the inner ring is the four hosts as arc segments (CPU on the outer track, memory on the inner), the middle ring is one tick per Uptime Kuma monitor, and the outer ring is the ten game servers as nodes that grow and turn gold when someone is on. The rings rotate slowly; the core breathes. Every tool is a holographic tile with a status rail.</p>
       <div class="shots">
-        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:c1-flight-deck-desktop}}" alt="Flight Deck desktop"></div></div>
-        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:c1-flight-deck-mobile}}" alt="Flight Deck phone"></div></div>
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:c1-jarvis-desktop}}" alt="JARVIS desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:c1-jarvis-mobile}}" alt="JARVIS phone"></div></div>
       </div>
       <div class="pc">
-        <div class="type"><span class="k">Type · palette</span><ul><li>B612 and B612 Mono, the typeface Airbus commissioned for cockpit displays. It is on Google Fonts and it reads at 11 px.</li><li>Phosphor green, caution amber, warning red, cyan for data, on near-black panels with bezel greys</li></ul></div>
-        <div class="sig"><span class="k">Signature</span><ul><li>The annunciator panel: dark tiles that light only when there is something to say, the same discipline as the real thing</li><li>Gauges have red arcs, so a needle in the red is visible from across a room</li></ul></div>
-        <div class="pro"><span class="k">Where it wins</span><ul><li>Fastest fault read of the nine, stock ones included</li><li>Everything on one screen at 1440, and it stacks cleanly on a phone</li></ul></div>
-        <div class="con"><span class="k">Where it loses</span><ul><li>The scope crowds when one machine has twenty services; it is a picture more than a menu</li><li>Links live in the checklist column, so it is a two-glance page for "open X"</li></ul></div>
+        <div class="type"><span class="k">Type · palette</span><ul><li>Orbitron for the brand and labels, Exo 2 for the briefing, Share Tech Mono for readouts</li><li>HUD cyan on black glass, gold for anything that wants attention, red only for down</li></ul></div>
+        <div class="sig"><span class="k">Signature</span><ul><li>The briefing: the page speaks first, in prose, and the numbers back it up</li><li>The reactor: five rings, all of them real data, nothing decorative except the outer tick ring</li></ul></div>
+        <div class="pro"><span class="k">Where it wins</span><ul><li>The fastest human read of all nine: you read one sentence and you know</li><li>The most fun to leave on a wall screen</li></ul></div>
+        <div class="con"><span class="k">Where it loses</span><ul><li>The reactor is a picture, not a menu; links are in the tiles below the fold on a laptop</li><li>Motion. It is subtle and it honors reduced-motion, but some people will want it off</li></ul></div>
       </div>
     </article>
 
@@ -137,7 +137,7 @@
     <h2>Against the stock six</h2>
     <div class="tablewrap">
       <table>
-        <thead><tr><th></th><th class="num">Flight Deck</th><th class="num">Rack</th><th class="num">Transit</th><th class="num">best stock</th></tr></thead>
+        <thead><tr><th></th><th class="num">JARVIS</th><th class="num">Rack</th><th class="num">Transit</th><th class="num">best stock</th></tr></thead>
         <tbody>
           <tr><td>Is anything on fire?</td><td class="num best">5</td><td class="num">4</td><td class="num">4</td><td class="num">5 · H3</td></tr>
           <tr><td>Density at a desk</td><td class="num">4</td><td class="num best">5</td><td class="num">3</td><td class="num">5 · G2</td></tr>
@@ -151,7 +151,7 @@
       </table>
     </div>
     <div class="note">
-      <p><b>Honest trade.</b> The customs cost nothing to add a service to (edit the inventory, done) and everything to add a new kind of widget to (you write it). Homepage is the reverse. The customs also have zero upstream: no updates, no CVEs, no breaking config changes, and no one else's roadmap. If one of these is the answer, the practical shape is <b>Flight Deck as the phone and wall page, Rack as the desk page</b>, sharing the same data layer, with Transit kept for the family. If you'd rather not own frontend code, H2 plus H3 remains the right stock answer.</p>
+      <p><b>Honest trade.</b> The customs cost nothing to add a service to (edit the inventory, done) and everything to add a new kind of widget to (you write it). Homepage is the reverse. The customs also have zero upstream: no updates, no CVEs, no breaking config changes, and no one else's roadmap. If one of these is the answer, the practical shape is <b>JARVIS as the wall and phone page, Rack as the desk page</b>, sharing the same data layer, with Transit kept for the family. If you'd rather not own frontend code, H2 plus H3 remains the right stock answer.</p>
     </div>
   </section>
 </div>

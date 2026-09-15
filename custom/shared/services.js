@@ -753,8 +753,8 @@ window.HB_SERVICES = [
   "link": false
  },
  {
-  "name": "c1-flight-deck",
-  "label": "C1 Flight Deck",
+  "name": "c1-jarvis",
+  "label": "C1 Jarvis",
   "host": "hub",
   "kind": "http",
   "url": "http://192.168.1.141:3301",

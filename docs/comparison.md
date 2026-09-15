@@ -152,7 +152,7 @@ the feed, Uptime Kuma, Proxmox and Plex on the same origin (secrets injected ser
 
 | Port | Variant | Idea | Screens |
 |---|---|---|---|
-| 3301 | **C1 Flight Deck** | Aircraft annunciator panel + engine gauges per host + nav scope of services. B612 (Airbus cockpit font). | `c1-flight-deck-*.jpg` |
+| 3301 | **C1 JARVIS** | Arc-reactor core whose rings are hosts / monitors / game servers, a spoken-style briefing line, holographic tiles. Replaced Flight Deck on request. | `c1-jarvis-*.jpg` |
 | 3302 | **C2 Rack Elevation** | The lab as a literal rack: drive bays that fill, an LED per container, patch panel of links. | `c2-rack-*.jpg` |
 | 3303 | **C3 Transit Map** | One line per machine, stations are tools, interchange for Ollama, departure board for delays. | `c3-transit-*.jpg` |
 

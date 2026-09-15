@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS · Homebase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap">
+<style>
+  :root {
+    --void: #03060A; --deep: #071523; --glass: rgba(10, 40, 62, .35); --edge: rgba(53, 214, 255, .35); --edge-2: rgba(53, 214, 255, .12);
+    --cyan: #35D6FF; --cyan-2: #8FE9FF; --ice: #E8F6FF; --dim: #6FA3B8; --gold: #F5B841; --red: #FF5A4E; --green: #4CF0B0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--void); color: var(--ice); }
+  body { font: 15px/1.45 "Exo 2", system-ui, sans-serif; padding-inline: 18px; padding-block: 14px 30px; min-height: 100vh;
+    background-image: radial-gradient(1200px 600px at 50% 40%, rgba(53,214,255,.10), transparent 60%), radial-gradient(800px 400px at 50% 110%, rgba(245,184,65,.06), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 3px, rgba(53,214,255,.025) 3px 4px); }
+  a { color: inherit; text-decoration: none; }
+  .mono { font-family: "Share Tech Mono", ui-monospace, monospace; }
+  .display { font-family: "Orbitron", "Exo 2", sans-serif; }
+
+  /* HUD frame corners */
+  .hud { position: relative; background: var(--glass); border: 1px solid var(--edge-2); padding: 14px 16px; backdrop-filter: blur(2px); }
+  .hud::before, .hud::after { content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid var(--cyan); opacity: .8; }
+  .hud::before { left: -1px; top: -1px; border-right: 0; border-bottom: 0; }
+  .hud::after { right: -1px; bottom: -1px; border-left: 0; border-top: 0; }
+  .hud h2 { margin: 0 0 8px; font: 700 11px "Orbitron", sans-serif; letter-spacing: .28em; text-transform: uppercase; color: var(--cyan); display: flex; justify-content: space-between; gap: 8px; }
+  .hud h2 span { font: 12px "Share Tech Mono", monospace; letter-spacing: .04em; color: var(--dim); text-transform: none; }
+
+  header { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; margin-bottom: 14px; }
+  header .brand { font: 900 22px "Orbitron", sans-serif; letter-spacing: .32em; color: var(--cyan); text-shadow: 0 0 18px rgba(53,214,255,.6); }
+  header .brand small { display: block; font: 300 11px "Exo 2", sans-serif; letter-spacing: .3em; color: var(--dim); }
+  header .clock { text-align: right; font: 500 20px "Orbitron", sans-serif; color: var(--ice); letter-spacing: .08em; }
+  header .clock small { display: block; font: 12px "Share Tech Mono", monospace; color: var(--dim); letter-spacing: .1em; }
+  .briefing { font: 300 18px/1.5 "Exo 2", sans-serif; color: var(--ice); min-height: 3.2em; padding: 6px 16px; border-left: 2px solid var(--cyan); background: linear-gradient(90deg, rgba(53,214,255,.10), transparent 70%); }
+  .briefing b { font-weight: 600; color: var(--cyan-2); }
+  .briefing .warn { color: var(--gold); font-weight: 600; } .briefing .crit { color: var(--red); font-weight: 600; }
+  .briefing .cursor { display: inline-block; width: 9px; height: 18px; background: var(--cyan); vertical-align: -3px; margin-left: 2px; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { to { visibility: hidden; } }
+  @media (max-width: 760px) { header { grid-template-columns: 1fr; } header .clock { text-align: left; } }
+
+  .grid { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.4fr) minmax(280px, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr 1fr; } .reactor-col { grid-column: 1 / -1; order: -1; } }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  .reactor-col { display: grid; gap: 14px; }
+  .reactor { display: grid; place-items: center; padding: 6px; }
+  .reactor svg { width: min(100%, 620px); height: auto; display: block; overflow: visible; }
+  .ring-slow { transform-origin: 300px 300px; animation: spin 140s linear infinite; }
+  .ring-rev { transform-origin: 300px 300px; animation: spin 90s linear infinite reverse; }
+  .core-pulse { animation: pulse 3.2s ease-in-out infinite; transform-origin: 300px 300px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .ring-slow, .ring-rev, .core-pulse, .briefing .cursor { animation: none; } }
+  .reactor text { font-family: "Share Tech Mono", monospace; fill: var(--dim); }
+  .reactor .core-t { font-family: "Orbitron", sans-serif; font-weight: 900; fill: var(--ice); }
+  .reactor .core-s { font-family: "Share Tech Mono", monospace; fill: var(--cyan); }
+  .reactor .hostlbl { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 10px; fill: var(--cyan-2); letter-spacing: .12em; }
+  .reactor .node { cursor: default; }
+  .reactor .node text { fill: var(--ice); font-size: 9px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; justify-content: center; font: 11px "Share Tech Mono", monospace; color: var(--dim); }
+  .legend i { display: inline-block; width: 10px; height: 3px; background: var(--cyan); vertical-align: middle; margin-right: 5px; }
+
+  /* host cards */
+  .hosts { display: grid; gap: 10px; }
+  .host { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--edge-2); background: rgba(3,6,10,.4); position: relative; }
+  .host::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--cyan); opacity: .7; }
+  .host.down::before { background: var(--red); }
+  .host .n { font: 700 13px "Orbitron", sans-serif; letter-spacing: .12em; color: var(--ice); }
+  .host .n small { display: block; font: 11px "Share Tech Mono", monospace; letter-spacing: .04em; color: var(--dim); }
+  .host .arcs { display: flex; gap: 6px; }
+  .host .arc { width: 54px; height: 54px; position: relative; }
+  .host .arc svg { width: 54px; height: 54px; transform: rotate(-90deg); }
+  .host .arc .v { position: absolute; inset: 0; display: grid; place-items: center; font: 12px "Share Tech Mono", monospace; color: var(--ice); }
+  .host .arc .l { position: absolute; left: 0; right: 0; bottom: -12px; text-align: center; font: 9px "Share Tech Mono", monospace; letter-spacing: .1em; color: var(--dim); }
+  .host .meta { grid-column: 1 / -1; font: 12px "Share Tech Mono", monospace; color: var(--dim); display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; }
+  .host .meta b { color: var(--ice); font-weight: 400; }
+  .host .meta .warn { color: var(--gold); } .host .meta .crit { color: var(--red); }
+
+  .list { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+  .list li { display: grid; grid-template-columns: 8px 1fr auto; gap: 8px; align-items: center; padding: 4px 6px; font: 13px "Exo 2", sans-serif; border-bottom: 1px solid var(--edge-2); }
+  .list li:last-child { border-bottom: 0; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #23404d; }
+  .dot.up { background: var(--green); box-shadow: 0 0 8px var(--green); } .dot.down { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  .dot.pending { background: var(--gold); } .dot.paused, .dot.retired { background: #23404d; } .dot.none { background: var(--cyan); }
+  .list .r { font: 12px "Share Tech Mono", monospace; color: var(--dim); text-align: right; }
+  .list .r b { color: var(--ice); font-weight: 400; }
+  .players { color: var(--gold); font-weight: 600; }
+
+  /* holo tiles */
+  .tiles { display: grid; gap: 14px; margin-top: 14px; }
+  .fn { display: grid; gap: 8px; }
+  .fn h3 { margin: 0; font: 700 11px "Orbitron", sans-serif; letter-spacing: .3em; text-transform: uppercase; color: var(--cyan); display: flex; align-items: center; gap: 10px; }
+  .fn h3::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--edge), transparent); }
+  .fn h3 span { font: 11px "Share Tech Mono", monospace; letter-spacing: 0; color: var(--dim); }
+  .tilegrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .tile { position: relative; padding: 9px 10px 9px 12px; border: 1px solid var(--edge-2); background: linear-gradient(135deg, rgba(53,214,255,.10), rgba(53,214,255,.02)); display: grid; gap: 2px; transition: border-color .15s, transform .15s; }
+  .tile::before { content: ""; position: absolute; left: -1px; top: 6px; bottom: 6px; width: 2px; background: var(--cyan); opacity: .9; }
+  .tile.down::before { background: var(--red); } .tile.pending::before { background: var(--gold); } .tile.paused::before, .tile.retired::before { background: #23404d; }
+  .tile:hover { border-color: var(--cyan); transform: translateY(-1px); }
+  .tile .t { font: 600 13px "Exo 2", sans-serif; color: var(--ice); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .s { font: 11px "Share Tech Mono", monospace; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.down .s { color: var(--red); } .tile.pending .s { color: var(--gold); }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">JARVIS<small>HOMEBASE · HUB 192.168.1.141</small></div>
+  <div class="briefing" id="briefing" aria-live="polite">Initializing…<span class="cursor"></span></div>
+  <div class="clock"><span id="clock">--:--</span><small id="date">—</small></div>
+</header>
+
+<div class="grid">
+  <div class="hud"><h2>Systems <span id="hosts-sub"></span></h2><div class="hosts" id="hosts"></div></div>
+
+  <div class="reactor-col">
+    <div class="hud reactor"><svg id="reactor" viewBox="0 0 600 600" role="img" aria-label="Arc reactor: core shows fleet state, inner ring is hosts, middle ring is every monitor, outer ring is game servers"></svg>
+      <div class="legend"><span><i></i>inner ring · hosts (cpu outer, mem inner)</span><span><i style="background:var(--green)"></i>middle ring · one tick per monitor</span><span><i style="background:var(--gold)"></i>outer ring · game servers, players</span></div>
+    </div>
+  </div>
+
+  <div class="hud"><h2>Engagements <span id="eng-sub"></span></h2><ul class="list" id="games"></ul><h2 style="margin-top:12px">Plex <span id="plex-sub"></span></h2><ul class="list" id="plex"></ul></div>
+</div>
+
+<div class="hud tiles" id="tiles"></div>
+
+<script src="/shared/services.js"></script>
+<script src="/shared/data.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const FN = ['media', 'games', 'ai', 'infra', 'business', 'dev', 'family'];
+const COL = { up: '#4CF0B0', down: '#FF5A4E', pending: '#F5B841', paused: '#23404d', retired: '#23404d', none: '#35D6FF', maint: '#35D6FF' };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+setInterval(() => { const n = new Date(); $('#clock').textContent = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); $('#date').textContent = n.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase(); }, 1000);
+
+// ---------- briefing (JARVIS speaks the state)
+function briefing(d) {
+  const h = new Date().getHours(); const greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const f = d.feed; const all = Object.values(d.kuma.byName); const up = all.filter(m => m.status === 'up').length;
+  const down = all.filter(m => m.status === 'down').map(m => { const [h, l] = m.name.split(' · '); return l === 'host' ? `${h} (ping)` : l; });
+  const parts = [`${greet}, sir.`];
+  if (!f) parts.push(`<span class="crit">I have no fleet snapshot.</span>`);
+  else {
+    const hostsDown = f.hosts.filter(x => !x.reachable).map(x => x.name);
+    if (hostsDown.length) parts.push(`<span class="crit">${hostsDown.join(' and ')} ${hostsDown.length > 1 ? 'are' : 'is'} not responding.</span>`);
+    else parts.push(`All ${f.hosts.length} machines are responding.`);
+    parts.push(`<b>${up} of ${all.length}</b> monitors are green${down.length ? `; <span class="warn">${down.join(', ')}</span> ${down.length > 1 ? 'are' : 'is'} not` : ''}.`);
+    for (const a of f.alerts) {
+      if (a.key.startsWith('disk:')) parts.push(`<span class="warn">${a.host}'s ${a.msg.replace(/\s+/g, ' ').replace(' free', ' free')}</span> — I would address that soon.`);
+      else if (a.key.startsWith('unhealthy:')) parts.push(`<span class="warn">${a.msg.replace('container ', '').replace(' reports unhealthy', '')}</span> reports unhealthy on ${a.host}.`);
+      else parts.push(`<span class="warn">${a.msg}</span> on ${a.host}.`);
+    }
+  }
+  const players = d.mc.reduce((a, g) => a + g.players, 0); const off = d.mc.filter(g => !g.online);
+  parts.push(off.length ? `<span class="crit">${off.map(g => g.label).join(', ')} ${off.length > 1 ? 'are' : 'is'} offline.</span>` : `All ${d.mc.length} game servers answer.`);
+  parts.push(players ? `<b>${players}</b> player${players > 1 ? 's' : ''} online.` : 'No players online.');
+  parts.push(d.plex ? (d.plex.streams ? `<b>${d.plex.streams}</b> Plex stream${d.plex.streams > 1 ? 's' : ''} running.` : 'Plex is idle.') : 'Plex is not answering.');
+  parts.push(`Feed is ${HB.fmtAgo(f?.generatedAt) || 'missing'}.`);
+  const html = parts.join(' ');
+  const el = $('#briefing');
+  if (reduced) { el.innerHTML = html; return; }
+  // typewriter over the plain text, then swap in the marked-up version
+  const plain = html.replace(/<[^>]+>/g, ''); let i = 0; el.innerHTML = '<span class="cursor"></span>';
+  clearInterval(briefing.t);
+  briefing.t = setInterval(() => { i += 3; el.innerHTML = esc(plain.slice(0, i)) + '<span class="cursor"></span>'; if (i >= plain.length) { clearInterval(briefing.t); el.innerHTML = html + '<span class="cursor"></span>'; } }, 18);
+}
+
+// ---------- reactor
+function arc(cx, cy, r, a0, a1) { const p = a => [cx + r * Math.cos(a), cy + r * Math.sin(a)]; const [x0, y0] = p(a0), [x1, y1] = p(a1); const large = a1 - a0 > Math.PI ? 1 : 0; return `M${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${large} 1 ${x1.toFixed(1)},${y1.toFixed(1)}`; }
+function reactor(d) {
+  const cx = 300, cy = 300; let s = '';
+  s += `<defs><radialGradient id="core"><stop offset="0" stop-color="#E8F6FF" stop-opacity=".95"/><stop offset=".35" stop-color="#35D6FF" stop-opacity=".55"/><stop offset="1" stop-color="#35D6FF" stop-opacity="0"/></radialGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+  // outer decorative ring with 72 ticks (rotating slowly)
+  s += `<g class="ring-slow" opacity=".55">`;
+  for (let i = 0; i < 72; i++) { const a = i * Math.PI / 36; const l = i % 6 === 0 ? 12 : 5; s += `<line x1="${cx + 268 * Math.cos(a)}" y1="${cy + 268 * Math.sin(a)}" x2="${cx + (268 - l) * Math.cos(a)}" y2="${cy + (268 - l) * Math.sin(a)}" stroke="#35D6FF" stroke-width="${i % 6 === 0 ? 2 : 1}"/>`; }
+  s += `<circle cx="${cx}" cy="${cy}" r="272" fill="none" stroke="#35D6FF" stroke-width="1" stroke-dasharray="40 18 6 18" opacity=".6"/></g>`;
+  // core
+  const f = d.feed; const all = Object.values(d.kuma.byName); const up = all.filter(m => m.status === 'up').length;
+  const state = !f ? 'NO FEED' : f.critCount || f.hosts.some(h => !h.reachable) ? 'CRIT' : f.warnCount ? 'WARN' : 'OK';
+  const coreCol = state === 'OK' ? '#4CF0B0' : state === 'WARN' ? '#F5B841' : '#FF5A4E';
+  s += `<circle class="core-pulse" cx="${cx}" cy="${cy}" r="86" fill="url(#core)"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="62" fill="#03060A" stroke="${coreCol}" stroke-width="2" filter="url(#glow)"/>`;
+  s += `<text class="core-t" x="${cx}" y="${cy - 4}" text-anchor="middle" font-size="22" fill="${coreCol}">${state}</text>`;
+  s += `<text class="core-s" x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="12">${up}/${all.length} UP</text>`;
+  s += `<text x="${cx}" y="${cy + 32}" text-anchor="middle" font-size="9">${f ? HB.fmtAgo(f.generatedAt).toUpperCase() : ''}</text>`;
+  // hosts ring (r 100-130): 4 segments
+  const hosts = ['Server-Rig', 'PlexBoy', 'BlueRig', 'pve'];
+  const seg = Math.PI * 2 / hosts.length, gapA = .08;
+  hosts.forEach((name, i) => {
+    const a0 = -Math.PI / 2 + i * seg + gapA / 2, a1 = a0 + seg - gapA;
+    let cpu = null, mem = null, ok = true;
+    if (name === 'pve') { cpu = d.pve?.cpu; mem = d.pve?.memPct; ok = !!d.pve; } else { const h = HB.host(name); cpu = h?.cpuPct; mem = h?.memUsedPct; ok = !!h?.reachable; }
+    s += `<path d="${arc(cx, cy, 128, a0, a1)}" stroke="#0e2a3b" stroke-width="10" fill="none"/><path d="${arc(cx, cy, 112, a0, a1)}" stroke="#0e2a3b" stroke-width="10" fill="none"/>`;
+    if (cpu != null) s += `<path d="${arc(cx, cy, 128, a0, a0 + (a1 - a0) * Math.max(.01, cpu / 100))}" stroke="${cpu >= 90 ? '#FF5A4E' : cpu >= 70 ? '#F5B841' : '#35D6FF'}" stroke-width="10" fill="none" stroke-linecap="butt"/>`;
+    if (mem != null) s += `<path d="${arc(cx, cy, 112, a0, a0 + (a1 - a0) * Math.max(.01, mem / 100))}" stroke="${mem >= 90 ? '#FF5A4E' : mem >= 80 ? '#F5B841' : '#8FE9FF'}" stroke-width="10" fill="none"/>`;
+    const am = (a0 + a1) / 2; const lx = cx + 150 * Math.cos(am), ly = cy + 150 * Math.sin(am);
+    s += `<text class="hostlbl" x="${lx}" y="${ly + 3}" text-anchor="middle" fill="${ok ? '#8FE9FF' : '#FF5A4E'}">${name.toUpperCase()}</text>`;
+    s += `<text x="${lx}" y="${ly + 15}" text-anchor="middle" font-size="9">${cpu != null ? `CPU ${cpu}% · MEM ${mem}%` : ok ? 'PORTS ONLY' : 'NO DATA'}</text>`;
+  });
+  // monitors ring (r 190): one tick per monitor, rotating reverse
+  s += `<g class="ring-rev">`;
+  const mons = d.kuma.groups.flatMap(g => g.monitors);
+  mons.forEach((m, i) => { const a = -Math.PI / 2 + i * Math.PI * 2 / Math.max(1, mons.length); const col = COL[m.status] || COL.none; const l = m.status === 'down' ? 16 : 10;
+    s += `<line x1="${cx + 190 * Math.cos(a)}" y1="${cy + 190 * Math.sin(a)}" x2="${cx + (190 + l) * Math.cos(a)}" y2="${cy + (190 + l) * Math.sin(a)}" stroke="${col}" stroke-width="${m.status === 'down' ? 3 : 2}"><title>${esc(m.name)} · ${m.status}</title></line>`; });
+  s += `<circle cx="${cx}" cy="${cy}" r="188" fill="none" stroke="#35D6FF" stroke-width="1" opacity=".35"/></g>`;
+  // game servers ring (r 235): nodes with players
+  const games = d.mc;
+  games.forEach((g, i) => { const a = -Math.PI / 2 + (i + .5) * Math.PI * 2 / Math.max(1, games.length); const x = cx + 236 * Math.cos(a), y = cy + 236 * Math.sin(a); const col = g.online ? (g.players ? '#F5B841' : '#4CF0B0') : '#FF5A4E';
+    s += `<g class="node"><title>${esc(g.label)} · ${g.online ? g.players + '/' + g.max : 'offline'}</title><circle cx="${x}" cy="${y}" r="${g.players ? 7 : 4.5}" fill="${col}" filter="url(#glow)"/>${g.players ? `<text x="${x}" y="${y + 3}" text-anchor="middle" font-size="8" fill="#03060A" font-weight="700">${g.players}</text>` : ''}
+      <text x="${cx + 252 * Math.cos(a)}" y="${cy + 252 * Math.sin(a) + 3}" text-anchor="${Math.cos(a) > .2 ? 'start' : Math.cos(a) < -.2 ? 'end' : 'middle'}" font-size="9" fill="${g.online ? '#6FA3B8' : '#FF5A4E'}">${esc(g.label)}</text></g>`; });
+  $('#reactor').innerHTML = s;
+}
+
+// ---------- host cards
+function arcGauge(v, label, warn, crit, invert) {
+  const r = 22, c = 2 * Math.PI * r; const has = v != null; const pct = has ? Math.min(100, Math.max(0, v)) : 0;
+  const bad = !has ? '#23404d' : invert ? (v < crit ? '#FF5A4E' : v < warn ? '#F5B841' : '#35D6FF') : (v >= crit ? '#FF5A4E' : v >= warn ? '#F5B841' : '#35D6FF');
+  return `<div class="arc"><svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="${r}" fill="none" stroke="#0e2a3b" stroke-width="5"/><circle cx="27" cy="27" r="${r}" fill="none" stroke="${bad}" stroke-width="5" stroke-dasharray="${c * pct / 100} ${c}" stroke-linecap="round"/></svg><div class="v">${has ? Math.round(v) + '%' : '—'}</div><div class="l">${label}</div></div>`;
+}
+function hostsPanel(d) {
+  let html = '';
+  for (const name of ['Server-Rig', 'PlexBoy', 'BlueRig']) {
+    const h = HB.host(name); const worst = h ? HB.worstDisk(h) : null; const cont = h?.docker?.containers || []; const run = cont.filter(c => c.state === 'running');
+    const unh = run.filter(c => c.health === 'unhealthy').map(c => c.name);
+    html += `<div class="host ${h?.reachable ? '' : 'down'}"><div class="n">${name}<small>${HB.hostIp[name]} · ${h ? (h.reachable ? 'online' : 'NOT RESPONDING') : 'no data'}${h?.uptimeHours != null ? ' · up ' + h.uptimeHours.toFixed(0) + 'h' : ''}</small></div>
+      <div class="arcs">${arcGauge(h?.cpuPct, 'CPU', 70, 90)}${arcGauge(h?.memUsedPct, 'MEM', 80, 90)}${arcGauge(worst?.freePct, (worst?.drive || 'DISK') + ' FREE', 20, 10, true)}</div>
+      <div class="meta">${cont.length ? `<span>containers <b>${run.length}/${cont.length}</b></span>` : ''}${unh.length ? `<span class="warn">unhealthy <b>${esc(unh.join(', '))}</b></span>` : ''}${h?.memFreeGB != null ? `<span>free mem <b>${h.memFreeGB.toFixed(0)} GB</b></span>` : ''}${worst ? `<span class="${worst.freePct < 10 ? 'crit' : worst.freePct < 20 ? 'warn' : ''}">${esc(worst.drive)} <b>${worst.freeGB.toFixed(0)} GB free</b></span>` : ''}</div></div>`;
+  }
+  const p = d.pve;
+  html += `<div class="host ${p ? '' : 'down'}"><div class="n">pve<small>192.168.1.6 · ${p ? 'online · up ' + p.uptimeDays + 'd' : 'no data'}</small></div>
+    <div class="arcs">${arcGauge(p?.cpu, 'CPU', 70, 90)}${arcGauge(p?.memPct, 'MEM', 80, 90)}${arcGauge(p?.rootPct, 'ROOT', 75, 90)}</div>
+    <div class="meta">${p ? p.guests.map(g => `<span style="${g.status === 'running' ? '' : 'opacity:.4'}"><b>${esc(g.name)}</b></span>`).join('') : ''}</div></div>`;
+  $('#hosts').innerHTML = html;
+  const f = d.feed; $('#hosts-sub').textContent = f ? `${f.hosts.filter(h => h.reachable).length}/${f.hosts.length} responding` : '';
+}
+
+// ---------- engagements + tiles
+function right(d) {
+  const games = d.mc.slice().sort((a, b) => b.players - a.players || a.label.localeCompare(b.label));
+  const udp = HB.services.filter(s => s.kind === 'game-udp' && !s.name.startsWith('bedrock'));
+  $('#games').innerHTML = games.map(g => `<li><span class="dot ${g.online ? 'up' : 'down'}"></span><span>${esc(g.label)}</span><span class="r">${g.online ? `<b class="${g.players ? 'players' : ''}">${g.players}/${g.max}</b> ${esc(g.version)}` : '<b style="color:var(--red)">offline</b>'}</span></li>`).join('')
+    + udp.map(s => { const c = HB.host(s.host)?.docker?.containers?.find(c => c.name === s.name); const st = s.status !== 'live' ? s.status : c ? (c.state === 'running' ? 'up' : 'down') : 'none'; return `<li><span class="dot ${st}"></span><span>${esc(s.label)}</span><span class="r"><b>${esc(c?.status || s.status)}</b></span></li>`; }).join('');
+  $('#eng-sub').textContent = `${games.filter(g => g.online).length}/${games.length} up · ${games.reduce((a, g) => a + g.players, 0)} players`;
+  $('#plex').innerHTML = d.plex?.sessions?.length ? d.plex.sessions.map(s => `<li><span class="dot up"></span><span>${esc(s.user)} · ${esc(s.title)}</span><span class="r">${esc(s.state)}</span></li>`).join('') : `<li><span class="dot paused"></span><span style="color:var(--dim)">nobody watching</span><span></span></li>`;
+  $('#plex-sub').textContent = d.plex ? `${d.plex.streams} streaming` : 'no data';
+  let t = '';
+  for (const fn of FN) {
+    const items = HB.services.filter(s => s.fn === fn && s.url && s.link !== false && s.status !== 'retired');
+    if (!items.length) continue;
+    const up = items.filter(s => HB.serviceStatus(s) === 'up').length;
+    t += `<div class="fn"><h3>${fn} <span>${up}/${items.length}</span></h3><div class="tilegrid">` + items.map(s => { const st = HB.serviceStatus(s); return `<a class="tile ${st}" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.note || '')}"><span class="t">${esc(s.label)}</span><span class="s">${esc(s.host)} · ${st === 'none' ? 'link' : st}${s.status !== 'live' ? ' · ' + s.status : ''}</span></a>`; }).join('') + '</div></div>';
+  }
+  const off = HB.services.filter(s => s.status !== 'live');
+  t += `<div class="fn"><h3>standby <span>${off.length}</span></h3><div class="tilegrid">` + off.map(s => `<span class="tile ${s.status}" title="${esc(s.note || '')}"><span class="t">${esc(s.label)}</span><span class="s">${s.status}</span></span>`).join('') + '</div></div>';
+  $('#tiles').innerHTML = t;
+}
+
+async function refresh() {
+  try { const d = await HB.load(); reactor(d); hostsPanel(d); right(d); briefing(d); }
+  catch (e) { $('#briefing').innerHTML = `<span class="crit">I've lost the data link, sir. ${esc(e.message)}</span>`; }
+}
+refresh(); setInterval(refresh, 60000);
+</script>
+</body>
+</html>

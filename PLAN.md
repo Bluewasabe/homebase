@@ -45,7 +45,7 @@ Plan (phases 0+1): `docs/superpowers/plans/2026-09-15-phase-0-1-bakeoff.md`
 - [x] `docs/comparison.md` + artifact page (https://claude.ai/artifact/17RGq8xZi4mpF1hgStEynH)
 - [x] homelab-map.md container tables regenerated (`ops/map-tables.py`)
 - [x] PR opened — https://github.com/Bluewasabe/homebase/pull/1
-- [x] Three from-scratch variants added on request: C1 Flight Deck :3301, C2 Rack :3302, C3 Transit :3303 (`custom/`, one nginx + mcstatus sidecar, `compose/custom`). Artifact: https://claude.ai/artifact/WHNeZyteFE9ZffZEx5Bh5U
+- [x] Three from-scratch variants added on request: C1 JARVIS :3301 (replaced Flight Deck on request), C2 Rack :3302, C3 Transit :3303 (`custom/`, one nginx + mcstatus sidecar, `compose/custom`). Artifact: https://claude.ai/artifact/WHNeZyteFE9ZffZEx5Bh5U
 - [ ] **Chris picks the winner** (nine candidates now)
 
 ### On Chris

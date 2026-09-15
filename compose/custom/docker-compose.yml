@@ -2,7 +2,7 @@
 # proxies the data sources on the same origin, so the pages need no CORS and
 # no secrets: /feed/ /kuma/ /pve/ /plex/ /mc/
 #
-#   3301 c1-flight-deck   3302 c2-rack   3303 c3-transit
+#   3301 c1-jarvis   3302 c2-rack   3303 c3-transit
 services:
   custom:
     image: nginx:alpine

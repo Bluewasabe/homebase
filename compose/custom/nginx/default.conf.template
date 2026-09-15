@@ -7,6 +7,6 @@ map $http_upgrade $connection_upgrade { default upgrade; '' close; }
 # (nginx has no server-level include of locations from a variable, so the
 #  block is repeated per server via the macro below)
 
-server { listen 3301; root /usr/share/nginx/html/c1-flight-deck; include /etc/nginx/conf.d/common.locations; }
+server { listen 3301; root /usr/share/nginx/html/c1-jarvis;      include /etc/nginx/conf.d/common.locations; }
 server { listen 3302; root /usr/share/nginx/html/c2-rack;        include /etc/nginx/conf.d/common.locations; }
 server { listen 3303; root /usr/share/nginx/html/c3-transit;     include /etc/nginx/conf.d/common.locations; }

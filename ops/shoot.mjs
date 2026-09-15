@@ -24,7 +24,7 @@ const TARGETS_ALL = [
   { name: 'g2-ops',     url: `http://${HUB}:3202/` },
   { name: 'g3-pages',   url: `http://${HUB}:3203/` },
   { name: 'g3-games',   url: `http://${HUB}:3203/games` },
-  { name: 'c1-flight-deck', url: `http://${HUB}:3301/` },
+  { name: 'c1-jarvis', url: `http://${HUB}:3301/` },
   { name: 'c2-rack',    url: `http://${HUB}:3302/` },
   { name: 'c3-transit', url: `http://${HUB}:3303/` },
   { name: 'kuma-status', url: `http://${HUB}:3001/status/homelab` },
