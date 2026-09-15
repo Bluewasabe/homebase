@@ -60,7 +60,7 @@ for s in services:
         continue
     host = hosts.get(s["host"], {})
     name = f"{s['host']} · {s['label']}"
-    paused = s["status"] == "paused"
+    paused = s["status"] == "paused" or s.get("monitor") == "paused"
     if kuma == "http":
         target = s.get("check") or s["url"]
         codes = ["200-299", "300-399"] + [str(c)[0] + "00-" + str(c)[0] + "99" for c in s.get("accept", [])]
@@ -70,6 +70,8 @@ for s in services:
         kw = dict(type=MonitorType.PORT, hostname=host["ip"], port=int(s["port"]), interval=60, maxretries=2)
     elif kuma == "ping":
         kw = dict(type=MonitorType.PING, hostname=host["ip"], interval=60)
+    elif kuma == "steam":
+        kw = dict(type=MonitorType.STEAM, hostname=host["ip"], port=int(s.get("query", s["port"])), interval=120, maxretries=3)
     elif kuma.startswith("gamedig:"):
         kw = dict(type=MonitorType.GAMEDIG, game=kuma.split(":", 1)[1], hostname=host["ip"],
                   port=int(s["port"]), interval=120, maxretries=3)

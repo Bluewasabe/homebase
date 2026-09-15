@@ -3,3 +3,4 @@
 **/data/
 *.log
 node_modules/
+docs/artifact/bakeoff.html

@@ -22,8 +22,8 @@
 - {name: create-mc,        label: Create,         host: Server-Rig, kind: game-mc,  port: 25574, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraft}
 - {name: bedrock-survival, label: Bedrock Survival, host: Server-Rig, kind: game-udp, port: 19132, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraftbe}
 - {name: bedrock-creative, label: Bedrock Creative, host: Server-Rig, kind: game-udp, port: 19134, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraftbe}
-- {name: palworld-server,  label: Palworld 1,     host: Server-Rig, kind: game-udp, port: 8211,  status: live, fn: games, icon: palworld.png, kuma: gamedig:palworld}
-- {name: palworld3-server, label: Palworld 3,     host: Server-Rig, kind: game-udp, port: 8219,  status: live, fn: games, icon: palworld.png, kuma: gamedig:palworld}
+- {name: palworld-server,  label: Palworld 1,     host: Server-Rig, kind: game-udp, port: 8211,  status: live, fn: games, icon: palworld.png, kuma: steam, query: 27015, monitor: paused, note: "No external probe answers (gamedig needs the REST API, A2S on 27015 is silent); monitor paused, Docker healthcheck via the feed is the signal"}
+- {name: palworld3-server, label: Palworld 3,     host: Server-Rig, kind: game-udp, port: 8219,  status: live, fn: games, icon: palworld.png, kuma: steam, query: 27017, monitor: paused, note: "Same as Palworld 1; monitor paused"}
 - {name: palworld2-server, label: Palworld 2,     host: Server-Rig, kind: game-udp, port: 8215,  status: retired, fn: games, icon: palworld.png, kuma: none, note: "Exit 137 (WSL memory ceiling), retired 2026-09-15"}
 - {name: hytale-server,    label: Hytale,         host: Server-Rig, kind: game-udp, port: 5520,  status: paused, fn: games, icon: mdi-gamepad-variant, kuma: none, note: "Exit 143, 12 days down; kids may want it back"}
 # sidecars (never linked)

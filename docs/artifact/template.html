@@ -1,0 +1,336 @@
+<title>Homebase Bake-off</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F2F5F8; --surface: #FFFFFF; --surface-2: #E7ECF1; --line: #CFD8E1;
+    --ink: #16202B; --muted: #5B6B7C; --accent: #157F8C; --accent-ink: #0E5C66;
+    --up: #2E8B57; --warn: #B7791F; --down: #C0392B; --paused: #7A8794;
+    --shadow: 0 1px 2px rgba(22,32,43,.06), 0 8px 24px rgba(22,32,43,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F151B; --surface: #172029; --surface-2: #1F2A35; --line: #2C3945;
+      --ink: #E6EDF3; --muted: #8CA0B3; --accent: #3FB7C4; --accent-ink: #7FD6E0;
+      --up: #4CC38A; --warn: #E0A63A; --down: #F0655A; --paused: #8CA0B3;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F151B; --surface: #172029; --surface-2: #1F2A35; --line: #2C3945;
+    --ink: #E6EDF3; --muted: #8CA0B3; --accent: #3FB7C4; --accent-ink: #7FD6E0;
+    --up: #4CC38A; --warn: #E0A63A; --down: #F0655A; --paused: #8CA0B3;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--ground); color: var(--ink); font: 16px/1.55 "IBM Plex Sans", system-ui, sans-serif; margin: 0; padding-inline: 20px; padding-block: 32px 64px; }
+  .wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 40px; }
+  h1, h2, h3 { font-family: "Barlow Semi Condensed", "Arial Narrow", sans-serif; text-wrap: balance; margin: 0; line-height: 1.1; }
+  h1 { font-size: 44px; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 28px; font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 22px; font-weight: 600; }
+  p { max-width: 68ch; margin: 0; }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .lede { font-size: 18px; color: var(--muted); max-width: 70ch; }
+  header { display: grid; gap: 12px; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .fact { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; }
+  .fact b { display: block; font-family: "Barlow Semi Condensed", sans-serif; font-size: 30px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+  .fact span { color: var(--muted); font-size: 13px; }
+  section { display: grid; gap: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  td.num, th.num { text-align: center; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  .best { color: var(--accent-ink); font-weight: 600; }
+  .pill { display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+  .pill.up { color: var(--up); } .pill.warn { color: var(--warn); } .pill.down { color: var(--down); } .pill.paused { color: var(--paused); }
+  figure { margin: 0; display: grid; gap: 10px; }
+  figcaption { color: var(--muted); font-size: 14px; max-width: 80ch; }
+  svg { max-width: 100%; height: auto; display: block; }
+  .diagram { background: var(--surface); border: 1px solid var(--line); padding: 16px; }
+  .variant { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); padding: 20px; display: grid; gap: 16px; }
+  .variant .head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; }
+  .variant .head .port { font-family: "IBM Plex Mono", monospace; color: var(--muted); font-size: 14px; }
+  .shots { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 14px; }
+  @media (max-width: 760px) { .shots { grid-template-columns: 1fr; } }
+  .shot { border: 1px solid var(--line); background: var(--surface-2); max-height: 560px; overflow: auto; }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot-label { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .pc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .pc div { display: grid; gap: 6px; }
+  .pc .k { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+  .pc .pro .k { color: var(--up); } .pc .con .k { color: var(--warn); } .pc .live .k { color: var(--accent-ink); }
+  ul { margin: 0; padding-left: 18px; } li { margin: 2px 0; }
+  .note { border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--surface); }
+  .todo li b { font-weight: 600; }
+  a { color: var(--accent-ink); }
+  code { font-family: "IBM Plex Mono", monospace; font-size: 14px; background: var(--surface-2); padding: 1px 5px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">homebase · phase 1 · built 2026-09-15 · hub 192.168.1.141 (LXC 110 on pve)</div>
+    <h1>Homebase Bake-off</h1>
+    <p class="lede">Six front doors are running side by side on the new hub, all reading the same Uptime Kuma and the same healthwatch feed. Every screenshot below is the real page with real data. Pick one; phase 2 promotes it to port 80.</p>
+    <div class="facts">
+      <div class="fact"><b>6</b><span>live variants · 3 Homepage, 3 Glance</span></div>
+      <div class="fact"><b>55</b><span>Uptime Kuma monitors · 51 up at capture</span></div>
+      <div class="fact"><b>29</b><span>linkable live services, all present in all six</span></div>
+      <div class="fact"><b>5 min</b><span>healthwatch feed cadence from BlueRig</span></div>
+      <div class="fact"><b>0</b><span>changes to any other host · read-only tokens only</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>How it fits together</h2>
+    <figure class="diagram">
+      <svg viewBox="0 0 980 420" role="img" aria-label="Data flow: healthwatch on BlueRig sweeps every host over SSH and pushes a JSON snapshot to hub; Uptime Kuma on hub probes every host and service directly; the six dashboards read the feed, Kuma, Proxmox and Plex with read-only tokens.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-width="1.2" font-family="IBM Plex Sans, sans-serif" font-size="12">
+          <!-- hosts column -->
+          <rect x="20" y="40" width="200" height="66" rx="3"/>
+          <text x="32" y="62" fill="currentColor" stroke="none" font-weight="600">BlueRig 192.168.1.67</text>
+          <text x="32" y="80" fill="currentColor" stroke="none">healthwatch agent (PowerShell)</text>
+          <text x="32" y="96" fill="currentColor" stroke="none" opacity=".7">sweep every 5 min, auto-heal</text>
+
+          <rect x="20" y="130" width="200" height="50" rx="3"/>
+          <text x="32" y="152" fill="currentColor" stroke="none" font-weight="600">Server-Rig 192.168.1.5</text>
+          <text x="32" y="168" fill="currentColor" stroke="none">31 containers · 12 game ports</text>
+
+          <rect x="20" y="200" width="200" height="50" rx="3"/>
+          <text x="32" y="222" fill="currentColor" stroke="none" font-weight="600">PlexBoy 192.168.1.217</text>
+          <text x="32" y="238" fill="currentColor" stroke="none">17 containers · Plex native</text>
+
+          <rect x="20" y="270" width="200" height="50" rx="3"/>
+          <text x="32" y="292" fill="currentColor" stroke="none" font-weight="600">pve 192.168.1.6</text>
+          <text x="32" y="308" fill="currentColor" stroke="none">nginx-vm, fibi, plausible, hub</text>
+
+          <rect x="20" y="340" width="200" height="50" rx="3" stroke-dasharray="4 3"/>
+          <text x="32" y="362" fill="currentColor" stroke="none" font-weight="600">UDM · scrypted · rustdesk</text>
+          <text x="32" y="378" fill="currentColor" stroke="none">ping + http only</text>
+
+          <!-- ssh sweep arrows from BlueRig to the three hosts -->
+          <path d="M120,106 L120,120 L232,120 L232,145" marker-end="url(#arrow)" opacity=".55"/>
+          <path d="M120,106 L120,120 L240,120 L240,215" marker-end="url(#arrow)" opacity=".55"/>
+          <path d="M120,106 L120,120 L248,120 L248,285" marker-end="url(#arrow)" opacity=".55"/>
+          <text x="260" y="128" fill="currentColor" stroke="none" font-size="11" opacity=".8">ssh: docker ps, disks, cpu, mem</text>
+
+          <!-- hub -->
+          <rect x="400" y="40" width="300" height="350" rx="4" stroke-width="1.6"/>
+          <text x="416" y="62" fill="currentColor" stroke="none" font-weight="600" font-size="13">hub · LXC 110 · 192.168.1.141 · Debian 12 + Docker</text>
+
+          <rect x="416" y="76" width="268" height="44" rx="3"/>
+          <text x="428" y="94" fill="currentColor" stroke="none" font-weight="600">feed :3009</text>
+          <text x="428" y="110" fill="currentColor" stroke="none">nginx · latest.json · read-only</text>
+
+          <rect x="416" y="132" width="268" height="58" rx="3"/>
+          <text x="428" y="150" fill="currentColor" stroke="none" font-weight="600">Uptime Kuma :3001</text>
+          <text x="428" y="166" fill="currentColor" stroke="none">55 monitors · status page /status/homelab</text>
+          <text x="428" y="182" fill="currentColor" stroke="none" opacity=".7">ping · http · minecraft · bedrock · steam</text>
+
+          <rect x="416" y="204" width="268" height="172" rx="3" stroke="#157F8C" stroke-width="1.6"/>
+          <text x="428" y="222" fill="#157F8C" stroke="none" font-weight="600">six front doors (bake-off)</text>
+          <text x="428" y="244" fill="currentColor" stroke="none">H1 Console :3101 · H2 Rack :3102</text>
+          <text x="428" y="260" fill="currentColor" stroke="none">H3 Pocket :3103 · G1 Feed :3201</text>
+          <text x="428" y="276" fill="currentColor" stroke="none">G2 Ops :3202 · G3 Pages :3203</text>
+          <text x="428" y="304" fill="currentColor" stroke="none" opacity=".8">read: feed · Kuma status API</text>
+          <text x="428" y="320" fill="currentColor" stroke="none" opacity=".8">read: Proxmox API (PVEAuditor token)</text>
+          <text x="428" y="336" fill="currentColor" stroke="none" opacity=".8">read: Plex API (token) · Minecraft ping</text>
+          <text x="428" y="360" fill="currentColor" stroke="none" opacity=".8">phase 2: winner → :80 as http://hub</text>
+
+          <!-- feed push -->
+          <path d="M220,73 L400,98" marker-end="url(#arrow)"/>
+          <text x="236" y="66" fill="currentColor" stroke="none" font-size="11">scp latest.json after every sweep</text>
+
+          <!-- kuma probes outward -->
+          <path d="M416,160 L232,160" marker-end="url(#arrow)" stroke-dasharray="5 3"/>
+          <path d="M416,164 L240,228" marker-end="url(#arrow)" stroke-dasharray="5 3"/>
+          <path d="M416,168 L240,298" marker-end="url(#arrow)" stroke-dasharray="5 3"/>
+          <path d="M416,172 L240,365" marker-end="url(#arrow)" stroke-dasharray="5 3"/>
+          <text x="262" y="196" fill="currentColor" stroke="none" font-size="11" opacity=".8">probes every 60–120 s (dashed)</text>
+
+          <!-- reader -->
+          <rect x="760" y="204" width="200" height="90" rx="3"/>
+          <text x="772" y="226" fill="currentColor" stroke="none" font-weight="600">Chris · LAN only</text>
+          <text x="772" y="244" fill="currentColor" stroke="none">browser / phone on the LAN</text>
+          <text x="772" y="260" fill="currentColor" stroke="none" opacity=".7">phase 4: Authentik groups</text>
+          <text x="772" y="276" fill="currentColor" stroke="none" opacity=".7">+ Tailscale / WireGuard</text>
+          <path d="M760,249 L700,249" marker-end="url(#arrow)"/>
+          <text x="706" y="240" fill="currentColor" stroke="none" font-size="11">http</text>
+
+          <!-- nothing public -->
+          <rect x="760" y="320" width="200" height="56" rx="3" stroke-dasharray="4 3"/>
+          <text x="772" y="342" fill="currentColor" stroke="none" font-weight="600">Internet · NPM · Cloudflare</text>
+          <text x="772" y="360" fill="currentColor" stroke="none" opacity=".8">no route to hub (by design)</text>
+        </g>
+      </svg>
+      <figcaption>Two independent sources of truth feed the dashboards: healthwatch pushes a snapshot from BlueRig every five minutes (solid arrow), and Uptime Kuma on hub probes every host and service itself (dashed). If BlueRig is off, Kuma still works; if hub is off, healthwatch still auto-heals. Nothing on hub is reachable from the internet.</figcaption>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Job</th><th>Tool</th><th>State</th></tr></thead>
+        <tbody>
+          <tr><td>Front door</td><td>Links to every tool, one-glance status</td><td>Homepage or Glance</td><td><span class="pill warn">bake-off</span></td></tr>
+          <tr><td>Up / down</td><td>Reachability, real game handshakes, alerts</td><td>Uptime Kuma</td><td><span class="pill up">live</span></td></tr>
+          <tr><td>Fleet snapshot</td><td>CPU, memory, every disk, every container, auto-heal</td><td>healthwatch → feed</td><td><span class="pill up">live</span></td></tr>
+          <tr><td>Metrics + logs</td><td>Trends, memory ceilings, log search</td><td>Prometheus · Grafana · Loki (Chris builds it, phase 3)</td><td><span class="pill paused">phase 3</span></td></tr>
+          <tr><td>Alerts</td><td>Push to Discord</td><td>Kuma now, Grafana later</td><td><span class="pill paused">needs webhook</span></td></tr>
+          <tr><td>Actions</td><td>Restart the thing</td><td>healthwatch queue today; Olivetin behind Authentik admin group</td><td><span class="pill paused">phase 5</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What the bake-off found in the lab</h2>
+    <p>Building the inventory from live <code>docker ps</code> instead of the map turned up things the old dashboards never showed.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Finding</th><th>Detail</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill down">broken</span> File Browser</td><td>Server-Rig compose publishes <code>8085→85</code> but the app listens on 80. TCP accepts, HTTP resets. healthwatch only ever checked the port, so it read green.</td><td>Fix the port map on Server-Rig.</td></tr>
+          <tr><td><span class="pill warn">disk</span> PlexBoy C:</td><td>8% free (77 GB). Every variant renders it red. Likely Plex metadata + Docker images.</td><td>Prune Docker, move Plex transcode dir off C:.</td></tr>
+          <tr><td><span class="pill warn">stale</span> homelab-map.md</td><td>Six months old. Server-Rig actually runs atm11, bettermc, create, cobblemon, dragons, two Bedrock servers, palworld3, five backup sidecars. PlexBoy runs Vaultwarden (never documented).</td><td>Container tables regenerated from the inventory today.</td></tr>
+          <tr><td><span class="pill down">ping</span> BlueRig</td><td>Drops ICMP echo, so its Kuma host monitor is red while the feed proves it alive.</td><td>Allow ICMPv4-In on BlueRig or drop that monitor.</td></tr>
+          <tr><td><span class="pill warn">probe</span> Palworld ×2</td><td>Neither probe answers: gamedig's Palworld check needs the REST API (off), Steam A2S on 27015 / 27017 is silent. Monitors paused; the Docker healthcheck in the feed is the signal.</td><td>Enable the REST API on both servers if you want an external probe.</td></tr>
+          <tr><td><span class="pill paused">decided</span> palworld2 · hytale · tube-intel</td><td>Retired / paused / paused per your call. Paused monitors exist but are silenced. All three died at the Server-Rig WSL memory ceiling.</td><td>Raise <code>.wslconfig</code> memory before reviving anything.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The six variants</h2>
+    <p>Each desktop shot is scrollable inside its frame (some pages are long); the phone shot is 390 px wide at 2× so it's full-page, scroll it too.</p>
+
+    <article class="variant">
+      <div class="head"><h3>H1 Console</h3><span class="port">Homepage · :3101</span><span class="pill">one column per machine</span></div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:h1-console-desktop}}" alt="H1 Console desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:h1-console-mobile}}" alt="H1 Console phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="live"><span class="k">Live today</span><ul><li>healthwatch card per machine: CPU, mem, C: free, container count</li><li>8 Minecraft cards with players and version</li><li>Proxmox VMs/LXCs/CPU/mem · Plex library · Kuma summary · alerts · Prometheus targets</li></ul></div>
+        <div class="pro"><span class="k">Pros</span><ul><li>Densest per screen; "where does X run" matches how you SSH around</li><li>Status dot on everything</li></ul></div>
+        <div class="con"><span class="k">Cons</span><ul><li>Five columns wrap 4+1 at 1440; BlueRig column is thin</li><li>Long scroll on a phone; retiring services still occupy columns</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>H2 Rack</h3><span class="port">Homepage · :3102</span><span class="pill">grouped by function</span></div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:h2-rack-desktop}}" alt="H2 Rack desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:h2-rack-mobile}}" alt="H2 Rack phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="live"><span class="k">Live today</span><ul><li>Status row: Kuma, fleet, alerts · then Media, Games (4-wide), AI, Infra, Business, Dev, Family</li><li>Same widget set as H1 · boxed header with weather</li></ul></div>
+        <div class="pro"><span class="k">Pros</span><ul><li>Best desktop read: rows top to bottom; the games grid is the nicest thing on any of the six</li><li>Grouping survives moving a service between machines</li></ul></div>
+        <div class="con"><span class="k">Cons</span><ul><li>No per-machine health at a glance</li><li>Infra row mixes real infra with the retiring old stack</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>H3 Pocket</h3><span class="port">Homepage · :3103</span><span class="pill">phone-first, 3-second read</span></div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:h3-pocket-desktop}}" alt="H3 Pocket desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:h3-pocket-mobile}}" alt="H3 Pocket phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="live"><span class="k">Live today</span><ul><li>Fleet strip (overall / warn / crit / sweep age) + Kuma up-down</li><li>Open alerts as a list · Top 8 with status dots</li><li>Everything else collapsed, one tap each</li></ul></div>
+        <div class="pro"><span class="k">Pros</span><ul><li>The at-work use case actually works: two alerts, eight links, done</li><li>Least noise of the six</li></ul></div>
+        <div class="con"><span class="k">Cons</span><ul><li>Under-uses a desktop screen; you'll want H1/H2 density at home</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>G1 Feed</h3><span class="port">Glance · :3201</span><span class="pill">start page</span></div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:g1-feed-desktop}}" alt="G1 Feed desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:g1-feed-mobile}}" alt="G1 Feed phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="live"><span class="k">Live today</span><ul><li>Fleet + alerts · hosts with every disk % · 19-site compact monitor · hub containers</li><li>Clock (with London), weather, calendar, release watch (Glance, Homepage, Kuma, itzg MC, Grafana), selfh.st + Grafana RSS, r/homelab</li></ul></div>
+        <div class="pro"><span class="k">Pros</span><ul><li>Pleasant to leave open all day; release watch is genuinely useful for a Docker fleet</li><li>Colored bookmark groups are a fast link wall</li></ul></div>
+        <div class="con"><span class="k">Cons</span><ul><li>No Minecraft player counts, no Proxmox/Plex depth (no native widgets)</li><li>Monitor widget is HTTP-only</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>G2 Ops</h3><span class="port">Glance · :3202</span><span class="pill">console</span></div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:g2-ops-desktop}}" alt="G2 Ops desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:g2-ops-mobile}}" alt="G2 Ops phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="live"><span class="k">Live today</span><ul><li>Fleet table: host / up / cpu / mem / containers / every disk, red under 10%</li><li>Every Kuma monitor with its current beat (status-page API + heartbeat subrequest)</li><li>Server-Rig and PlexBoy container lists colored by health with restart counts</li><li>Proxmox node stats from the API · Plex now-playing from the API · hub server stats</li></ul></div>
+        <div class="pro"><span class="k">Pros</span><ul><li>Most information of the six, all from three JSON sources</li><li>Proves Glance's custom-api can replace most Homepage widgets</li></ul></div>
+        <div class="con"><span class="k">Cons</span><ul><li>Desktop-only in practice; the table crushes at 390 px</li><li>Every panel is a Go template you maintain</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>G3 Pages</h3><span class="port">Glance · :3203</span><span class="pill">one page per domain</span></div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900 · Home</div><div class="shot"><img src="{{IMG:g3-pages-desktop}}" alt="G3 Pages home desktop"></div></div>
+        <div><div class="shot-label">390 × 844 · Home</div><div class="shot"><img src="{{IMG:g3-pages-mobile}}" alt="G3 Pages home phone"></div></div>
+      </div>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900 · Games page</div><div class="shot"><img src="{{IMG:g3-games-desktop}}" alt="G3 Games page desktop"></div></div>
+        <div><div class="shot-label">390 × 844 · Games page</div><div class="shot"><img src="{{IMG:g3-games-mobile}}" alt="G3 Games page phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="live"><span class="k">Live today</span><ul><li>Home: fleet, hosts, failing monitors, 8 links</li><li>Games: Kuma status for every Server-Rig monitor + all 30 containers with health</li><li>Media: Plex now-playing, PlexBoy disks · AI: Ollama model list · Infra: Proxmox + hub stats · Business & Dev</li></ul></div>
+        <div class="pro"><span class="k">Pros</span><ul><li>Each page complete for its domain; Home is as calm as H3</li><li>The Games page is what the kids would want</li></ul></div>
+        <div class="con"><span class="k">Cons</span><ul><li>Two clicks to some things</li><li>Same template-maintenance cost as G2</li></ul></div>
+      </div>
+    </article>
+  </section>
+
+  <section>
+    <h2>Uptime Kuma status page</h2>
+    <figure>
+      <div class="shot" style="max-height:520px"><img src="{{IMG:kuma-status-desktop}}" alt="Uptime Kuma status page with every monitor grouped by host"></div>
+      <figcaption>The public status page at /status/homelab, grouped by host. Every variant links here; it's also the JSON source G2 and G3 read. Red at capture: BlueRig ping, File Browser, Palworld ×2 (explained above; Palworld monitors since paused).</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Scoring</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th class="num">H1 Console</th><th class="num">H2 Rack</th><th class="num">H3 Pocket</th><th class="num">G1 Feed</th><th class="num">G2 Ops</th><th class="num">G3 Pages</th></tr></thead>
+        <tbody>
+          <tr><td>Glanceability · is anything on fire?</td><td class="num">3</td><td class="num">4</td><td class="num best">5</td><td class="num">4</td><td class="num">4</td><td class="num best">5</td></tr>
+          <tr><td>Density at a desk</td><td class="num best">5</td><td class="num">4</td><td class="num">2</td><td class="num">3</td><td class="num best">5</td><td class="num">4</td></tr>
+          <tr><td>Phone</td><td class="num">2</td><td class="num">3</td><td class="num best">5</td><td class="num">3</td><td class="num">1</td><td class="num">4</td></tr>
+          <tr><td>Live data depth today</td><td class="num">4</td><td class="num">4</td><td class="num">3</td><td class="num">3</td><td class="num best">5</td><td class="num">4</td></tr>
+          <tr><td>Config effort to maintain</td><td class="num">3</td><td class="num">3</td><td class="num">4</td><td class="num best">5</td><td class="num">2</td><td class="num">3</td></tr>
+          <tr><td>Room to grow (widgets, integrations)</td><td class="num best">5</td><td class="num best">5</td><td class="num">4</td><td class="num">3</td><td class="num">4</td><td class="num">4</td></tr>
+          <tr><td>A place you'd want to live</td><td class="num">3</td><td class="num">4</td><td class="num">4</td><td class="num best">5</td><td class="num">4</td><td class="num">4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p><b>My read.</b> Two ideas survived contact: H3's "alerts, then eight links" for the phone and H2's function rows for the desk. Homepage can do both from one <code>services.yaml</code> with two thin settings files. On the Glance side, G2 proved the platform can match Homepage on ops data at the cost of owning Go templates; G3 is the better Glance pick because its Home is calm and its Games page is the best game-server view of the six. If you want one answer: <b>H2 for the desk, with H3's Fleet / Alerts / Top-8 block lifted to the top</b>. It's your call.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Decisions and items for you</h2>
+    <ul class="todo">
+      <li><b>Pick a variant</b> (or a combination). Phase 2 promotes it to <code>http://hub</code> and stops the other five.</li>
+      <li><b>UniFi read-only local user</b> on the UDM Pro, for the network widget.</li>
+      <li><b>Discord channel + webhook URL</b> for alerts. Goes in hub's <code>.env</code>, then <code>ops/kuma-sync.py</code> wires it to every monitor.</li>
+      <li><b>DHCP reservation</b> for hub at 192.168.1.141.</li>
+      <li><b>File Browser port map</b> on Server-Rig (8085→85 should be 8085→80).</li>
+      <li><b>Server-Rig <code>.wslconfig</code> memory cap</b> before reviving Hytale or TubeIntel.</li>
+    </ul>
+  </section>
+</div>

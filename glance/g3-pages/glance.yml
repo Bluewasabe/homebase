@@ -111,13 +111,13 @@ pages:
                 links:
                   - { title: "Bedrock Survival · udp 19132", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
                   - { title: "Bedrock Creative · udp 19134", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
-                  - { title: "Palworld 1 · udp 8211", url: "http://192.168.1.141:3001/status/homelab", icon: di:palworld }
-                  - { title: "Palworld 3 · udp 8219", url: "http://192.168.1.141:3001/status/homelab", icon: di:palworld }
+                  - { title: "Palworld 1 · udp 8211", url: "http://192.168.1.141:3001/status/homelab", icon: mdi:controller }
+                  - { title: "Palworld 3 · udp 8219", url: "http://192.168.1.141:3001/status/homelab", icon: mdi:controller }
               - title: Paused / retired
                 color: 0 0 45
                 links:
                   - { title: "Hytale (paused)", url: "http://192.168.1.141:3001/status/homelab", icon: mdi:gamepad-variant }
-                  - { title: "Palworld 2 (retired)", url: "http://192.168.1.141:3001/status/homelab", icon: di:palworld }
+                  - { title: "Palworld 2 (retired)", url: "http://192.168.1.141:3001/status/homelab", icon: mdi:controller }
       - size: full
         widgets:
           - type: custom-api
