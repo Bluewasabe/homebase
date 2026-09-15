@@ -42,9 +42,9 @@ Plan (phases 0+1): `docs/superpowers/plans/2026-09-15-phase-0-1-bakeoff.md`
 - [x] Six variants live: H1 :3101, H2 :3102, H3 :3103, G1 :3201, G2 :3202, G3 :3203
 - [x] `ops/check-inventory.py` — every variant links all 29 live services
 - [x] `ops/shoot.mjs` — screenshots at 1440×900 and 390×844, looked at
-- [ ] `docs/comparison.md` + artifact page
-- [ ] homelab-map.md container tables regenerated (`ops/map-tables.py`)
-- [ ] PR opened
+- [x] `docs/comparison.md` + artifact page (https://claude.ai/artifact/17RGq8xZi4mpF1hgStEynH)
+- [x] homelab-map.md container tables regenerated (`ops/map-tables.py`)
+- [x] PR opened — https://github.com/Bluewasabe/homebase/pull/1
 - [ ] **Chris picks the winner**
 
 ### On Chris
