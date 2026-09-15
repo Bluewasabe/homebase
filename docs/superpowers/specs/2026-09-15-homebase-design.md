@@ -1,6 +1,6 @@
 # Homebase — Design Spec
 
-*Date: 2026-09-15 | Status: approved in conversation, awaiting written review*
+*Date: 2026-09-15 | Status: approved by Chris 2026-09-15 (incl. amendments: inventory source, service status, healthwatch feed)*
 
 ## Purpose
 
@@ -108,10 +108,27 @@ Uptime Kuma instance and the same read-only credentials. Not mockups.
 | 3202 | **G2 Ops** (Glance) | Glance pushed toward a console: monitor groups per host, server-stats, custom-API widgets against Uptime Kuma. | Whether Glance can match Homepage on ops |
 | 3203 | **G3 Pages** (Glance) | Multi-page: Home, Game Servers, Media, Business, Dev. | Navigation as the organizing idea |
 
-Every variant links to the full tool inventory from `plan/homelab-map.md` and the
-2026-07-05 inventory audit (whichever is newer per service), grouped per its concept.
-Services known dead (home.bookclub44.com target, port 5001 forward, openclaw
-gateway) are listed as retired, not linked as live.
+**Inventory source.** `plan/homelab-map.md` is stale (2026-03-19; Server-Rig now runs
+atm11, bettermc, create, cobblemon, dragons, bedrock-creative/survival, palworld3 and
+backup sidecars, none documented). The service inventory for Uptime Kuma and all six
+variants is therefore generated from **healthwatch state** (`healthwatch/state/baseline.json`
+and `latest.json`) plus a live `docker ps` on each host, written to `inventory/services.yaml`
+in this repo. Phase 1 also rewrites the machine tables in `plan/homelab-map.md` from that
+same data.
+
+**Every service carries a status:**
+
+| Status | Meaning | Uptime Kuma | Front door |
+|---|---|---|---|
+| live | expected up | monitor active, alerts | linked, status dot |
+| paused | intentionally down, may return | monitor exists, paused | listed under "Paused", no dot |
+| retired | not coming back | no monitor | listed under "Retired" or omitted |
+
+Decisions as of 2026-09-15: `palworld2-server` **retired** (palworld3 exists; exit 137 was
+the WSL memory ceiling). `hytale-server` **paused**. `tube-intel-web` + `tube-intel-worker`
+**paused** (exit 137, same ceiling). home.bookclub44.com target, port 5001 forward, and
+openclaw-gateway are **retired**. Nothing paused or retired is restarted by this project;
+the Server-Rig `.wslconfig` memory cap must be raised first (separate task).
 
 ## Shared backing services (phase 1)
 
@@ -134,6 +151,15 @@ gateway) are listed as retired, not linked as live.
 | Uptime Kuma API key | Homepage widget, Glance custom-API | Claude creates in Kuma after first login |
 | UniFi read-only local user | UniFi widget | **Chris** (UDM Pro UI) |
 | NPM API user | NPM widget | Claude creates via NPM admin (optional, phase 2) |
+
+**healthwatch feed.** healthwatch on BlueRig already collects per-host disk free,
+container state, and restart counts every 2 minutes and nothing displays it. `agent.ps1`
+gains one step: after each sweep it copies `state/latest.json` to `hub` over SSH
+(BlueRig's key authorized on the LXC). `hub` serves it read-only as
+`http://hub:3009/latest.json` from a tiny static container. Both Homepage (`customapi`
+widget) and Glance (`custom-api` widget) read it, so every variant shows per-host disk
+free and container counts on day one. Disk thresholds (PlexBoy C: at 9% free on
+2026-09-15 is the motivating case) render red in every variant.
 
 **Not in phase 1:** Docker container widgets for remote hosts. They need a read-only
 `docker-socket-proxy` on PlexBoy and Server-Rig plus a Hyper-V firewall rule on
@@ -165,7 +191,7 @@ right looks like" check.
 | Phase | Scope | Exit criteria |
 |---|---|---|
 | 0 | Spec, repo, PLAN/CLAUDE, LXC 110 created, Docker installed, `ops/deploy.sh` working | `ssh root@<hub-ip> docker ps` works from BlueRig; deploy.sh deploys an empty stack and health-gates |
-| 1 | Uptime Kuma + monitors + Discord; read-only creds; six variants live; screenshots; `docs/comparison.md` | All six ports answer; every monitor green or explained in comparison.md; screenshots at 1440x900 and 390x844 for each variant, looked at; comparison committed; **Chris picks** |
+| 1 | Inventory from healthwatch + `docker ps`; Uptime Kuma + monitors (live/paused) + Discord; healthwatch feed to hub; read-only creds; six variants live; screenshots; `docs/comparison.md`; homelab-map.md machine tables regenerated | All six ports answer; every monitor green or explained in comparison.md; screenshots at 1440x900 and 390x844 for each variant, looked at; comparison committed; **Chris picks** |
 | 2 | Winner promoted to port 80 on `hub` (URL is just `http://hub`); other five stopped (configs kept); retire Server-Rig homepage/homarr, pve homepage-vm/homarr-vm; remove dead home.bookclub44.com NPM host + DNS; docker-socket-proxy on PlexBoy + Server-Rig with Hyper-V rule; Docker widgets live | Duplicates gone; Docker widgets show all three hosts |
 | 3 | Grafana course revision with visuals; reference stack captured and removed; Chris executes the course; old minecraft-* stack retired after his stack scrapes | Chris's Grafana shows all three Windows hosts and all Docker hosts; front door links to it |
 | 4 | Authentik forward-auth on the front door and Grafana: `homebase-viewer` and `homebase-admin` groups; Grafana viewer/admin mapped from groups; remote access (Tailscale on hub, or UDM WireGuard, decided then) | Viewer login sees everything read-only; admin group exists with nothing to do yet |
