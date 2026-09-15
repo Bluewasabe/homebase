@@ -1,0 +1,186 @@
+# G1 Feed — Glance as a personal start page: fleet at a glance, then the
+# things a homelabber reads. Reads the healthwatch feed and Uptime Kuma.
+server:
+  port: 8080
+
+theme:
+  background-color: 225 14 10
+  primary-color: 205 80 62
+  positive-color: 150 55 50
+  negative-color: 0 70 60
+  contrast-multiplier: 1.05
+
+pages:
+  - name: Home
+    columns:
+      - size: small
+        widgets:
+          - type: clock
+            hour-format: 12h
+            timezones:
+              - timezone: Europe/London
+                label: London
+          - type: weather
+            location: Philadelphia, Pennsylvania, United States
+            units: imperial
+            hour-format: 12h
+          - type: calendar
+            first-day-of-week: sunday
+          - type: bookmarks
+            groups:
+              - title: Every day
+                links:
+                  - { title: Plex, url: "http://192.168.1.217:32400/web", icon: di:plex }
+                  - { title: Proxmox, url: "https://192.168.1.6:8006", icon: di:proxmox }
+                  - { title: Nginx Proxy Manager, url: "http://192.168.1.106:40081", icon: di:nginx-proxy-manager }
+                  - { title: UniFi, url: "https://192.168.1.1", icon: di:unifi }
+                  - { title: Uptime Kuma, url: "http://192.168.1.141:3001", icon: di:uptime-kuma }
+                  - { title: Open WebUI, url: "http://192.168.1.217:3000", icon: di:open-webui }
+                  - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+                  - { title: Vaultwarden, url: "http://192.168.1.217:8222", icon: di:vaultwarden }
+              - title: Media
+                color: 280 60 60
+                links:
+                  - { title: PhotoPrism, url: "http://192.168.1.5:2342", icon: di:photoprism }
+                  - { title: Media Manager, url: "http://192.168.1.217:45681", icon: mdi:movie-open }
+                  - { title: File Browser, url: "http://192.168.1.5:8085", icon: di:filebrowser }
+                  - { title: Plex (remote), url: "https://app.plex.tv", icon: di:plex }
+                  - { title: Scrypted, url: "https://192.168.1.61:10443", icon: mdi:cctv }
+              - title: AI
+                color: 150 60 55
+                links:
+                  - { title: Ollama (PlexBoy), url: "http://192.168.1.217:11434", icon: di:ollama }
+                  - { title: Ollama (Server-Rig), url: "http://192.168.1.5:11434", icon: di:ollama }
+              - title: Business
+                color: 40 90 60
+                links:
+                  - { title: FIBI, url: "https://alwaysbookit.com", icon: mdi:airplane }
+                  - { title: Plausible, url: "http://192.168.1.224:8000", icon: di:plausible }
+                  - { title: Plausible (public), url: "https://analytics.alwaysbookit.com", icon: di:plausible }
+                  - { title: Notion, url: "https://www.notion.so", icon: di:notion }
+              - title: Dev & infra
+                color: 0 0 70
+                links:
+                  - { title: GitHub, url: "https://github.com/Bluewasabe", icon: si:github }
+                  - { title: Cloudflare, url: "https://dash.cloudflare.com", icon: di:cloudflare }
+                  - { title: Authentik, url: "http://192.168.1.217:9000", icon: di:authentik }
+                  - { title: Obsidian Sync, url: "http://192.168.1.217:5984/_utils", icon: di:couchdb }
+                  - { title: Mission Control, url: "http://192.168.1.217:45680", icon: mdi:rocket-launch }
+              - title: Old stack (retiring)
+                color: 0 0 45
+                links:
+                  - { title: Grafana (old), url: "http://192.168.1.5:3000", icon: di:grafana }
+                  - { title: Prometheus (old), url: "http://192.168.1.5:9090", icon: di:prometheus }
+                  - { title: cAdvisor (old), url: "http://192.168.1.5:8080", icon: mdi:chart-box-outline }
+                  - { title: Homepage (old), url: "http://192.168.1.5:3005", icon: mdi:view-dashboard }
+                  - { title: Homarr (old), url: "http://192.168.1.5:7575", icon: mdi:view-dashboard-outline }
+
+      - size: full
+        widgets:
+          - type: custom-api
+            title: Fleet
+            title-url: http://${HUB_IP}:3009/latest.json
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ $o := .JSON.String "overall" }}
+              <div class="flex justify-between text-center">
+                <div>
+                  <div class="size-h2 {{ if eq $o "OK" }}color-positive{{ else if eq $o "CRIT" }}color-negative{{ else }}color-primary{{ end }}">{{ $o }}</div>
+                  <div class="size-h6">FLEET</div>
+                </div>
+                <div><div class="size-h2 color-highlight">{{ .JSON.Int "warnCount" }}</div><div class="size-h6">WARN</div></div>
+                <div><div class="size-h2 color-highlight">{{ .JSON.Int "critCount" }}</div><div class="size-h6">CRIT</div></div>
+                <div><div class="size-h5 color-subdue" style="padding-top:6px">{{ .JSON.String "generatedAtLocal" }}</div><div class="size-h6">LAST SWEEP</div></div>
+              </div>
+              {{ $alerts := .JSON.Array "alerts" }}
+              {{ if $alerts }}
+              <ul class="list list-gap-8 margin-top-15">
+              {{ range $alerts }}
+                <li><span class="{{ if eq (.String "sev") "crit" }}color-negative{{ else }}color-primary{{ end }}">{{ .String "host" }}</span> <span class="color-paragraph">{{ .String "msg" }}</span></li>
+              {{ end }}
+              </ul>
+              {{ end }}
+
+          - type: custom-api
+            title: Hosts
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              <ul class="list list-gap-10 list-with-separator">
+              {{ range .JSON.Array "hosts" }}
+                <li>
+                  <div class="flex justify-between">
+                    <span class="color-highlight size-h4">{{ .String "name" }}</span>
+                    <span class="color-subdue size-h5">{{ .String "ip" }} · {{ if .Bool "reachable" }}<span class="color-positive">up</span>{{ else }}<span class="color-negative">down</span>{{ end }}</span>
+                  </div>
+                  {{ if gt (.Int "memTotalGB") 0 }}
+                  <ul class="list-horizontal-text">
+                    <li>cpu {{ .Int "cpuPct" }}%</li>
+                    <li>mem {{ .Int "memUsedPct" }}%</li>
+                    <li>{{ len (.Array "docker.containers") }} containers</li>
+                    {{ range .Array "disks" }}{{ $f := .Int "freePct" }}<li{{ if lt $f 10 }} class="color-negative"{{ else if lt $f 20 }} class="color-primary"{{ end }}>{{ .String "drive" }} {{ $f }}% free</li>{{ end }}
+                  </ul>
+                  {{ end }}
+                </li>
+              {{ end }}
+              </ul>
+
+          - type: monitor
+            title: Services
+            cache: 1m
+            style: compact
+            sites:
+              - { title: Plex, url: "http://192.168.1.217:32400/web", check-url: "http://192.168.1.217:32400/identity", icon: di:plex }
+              - { title: PhotoPrism, url: "http://192.168.1.5:2342", icon: di:photoprism }
+              - { title: Media Manager, url: "http://192.168.1.217:45681", icon: mdi:movie-open }
+              - { title: File Browser, url: "http://192.168.1.5:8085", icon: di:filebrowser }
+              - { title: Open WebUI, url: "http://192.168.1.217:3000", icon: di:open-webui }
+              - { title: Ollama (PlexBoy), url: "http://192.168.1.217:11434", icon: di:ollama }
+              - { title: Ollama (Server-Rig), url: "http://192.168.1.5:11434", icon: di:ollama }
+              - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+              - { title: Authentik, url: "http://192.168.1.217:9000", check-url: "http://192.168.1.217:9000/-/health/live/", icon: di:authentik }
+              - { title: Vaultwarden, url: "http://192.168.1.217:8222", icon: di:vaultwarden }
+              - { title: Obsidian Sync, url: "http://192.168.1.217:5984/_utils", check-url: "http://192.168.1.217:5984/_up", alt-status-codes: [401], icon: di:couchdb }
+              - { title: Mission Control, url: "http://192.168.1.217:45680", icon: mdi:rocket-launch }
+              - { title: Proxmox, url: "https://192.168.1.6:8006", allow-insecure: true, icon: di:proxmox }
+              - { title: Nginx Proxy Manager, url: "http://192.168.1.106:40081", icon: di:nginx-proxy-manager }
+              - { title: UniFi, url: "https://192.168.1.1", allow-insecure: true, icon: di:unifi }
+              - { title: Scrypted, url: "https://192.168.1.61:10443", allow-insecure: true, icon: mdi:cctv }
+              - { title: FIBI, url: "https://alwaysbookit.com", check-url: "http://192.168.4.93:5050/", icon: mdi:airplane }
+              - { title: Plausible, url: "http://192.168.1.224:8000", icon: di:plausible }
+              - { title: Uptime Kuma, url: "http://192.168.1.141:3001", icon: di:uptime-kuma }
+
+          - type: docker-containers
+            title: Containers on hub
+            hide-by-default: false
+
+      - size: small
+        widgets:
+          - type: releases
+            title: Watching
+            cache: 12h
+            repositories:
+              - glanceapp/glance
+              - gethomepage/homepage
+              - louislam/uptime-kuma
+              - itzg/docker-minecraft-server
+              - grafana/grafana
+          - type: rss
+            title: Homelab reading
+            style: vertical-list
+            limit: 8
+            collapse-after: 4
+            cache: 3h
+            feeds:
+              - url: https://selfh.st/rss/
+                title: selfh.st
+              - url: https://grafana.com/blog/index.xml
+                title: Grafana
+              - url: https://forum.proxmox.com/forums/-/index.rss
+                title: Proxmox forum
+          - type: reddit
+            subreddit: homelab
+            style: vertical-list
+            limit: 6
+            collapse-after: 3

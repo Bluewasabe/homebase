@@ -1,0 +1,34 @@
+# H1 Console — one column per machine, maximum information density.
+title: Console
+description: Homebase H1 · every machine, every service, every number
+theme: dark
+color: zinc
+headerStyle: clean
+statusStyle: dot
+hideVersion: true
+maxGroupColumns: 5
+target: _blank
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+layout:
+  - Server-Rig:
+        style: column
+        icon: mdi-server-network
+  - PlexBoy:
+        style: column
+        icon: mdi-server
+  - pve & Network:
+        style: column
+        icon: mdi-lan
+  - Hub:
+        style: column
+        icon: mdi-home-circle
+  - BlueRig:
+        style: column
+        icon: mdi-desktop-tower
+  - Paused & Retired:
+        style: row
+        columns: 4
+        initiallyCollapsed: true
+        icon: mdi-pause-circle

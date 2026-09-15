@@ -1,0 +1,323 @@
+# H1 Console — grouped by machine. Feed host indexes: BlueRig 0, Server-Rig 1,
+# PlexBoy 2, nginx-vm 3, pve 4, hub 5 (order of hosts in healthwatch/config.json).
+
+- Server-Rig:
+    - healthwatch · Server-Rig:
+        icon: mdi-heart-pulse
+        description: 192.168.1.5 · Ryzen 9 5900XT · 128 GB
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          mappings:
+            - field: hosts.1.cpuPct
+              label: CPU
+              format: percent
+            - field: hosts.1.memUsedPct
+              label: Mem used
+              format: percent
+            - field: hosts.1.disks.0.freePct
+              label: "C: free"
+              format: percent
+            - field: hosts.1.docker.containers
+              label: Containers
+              format: size
+    - Vanilla:
+        icon: minecraft.png
+        description: 192.168.1.5:25565
+        widget: { type: minecraft, url: udp://192.168.1.5:25565 }
+    - ATM 11:
+        icon: minecraft.png
+        description: 192.168.1.5:25566
+        widget: { type: minecraft, url: udp://192.168.1.5:25566 }
+    - All the Mons:
+        icon: minecraft.png
+        description: 192.168.1.5:25567 · thread-leak restarter
+        widget: { type: minecraft, url: udp://192.168.1.5:25567 }
+    - ATM 10:
+        icon: minecraft.png
+        description: 192.168.1.5:25568
+        widget: { type: minecraft, url: udp://192.168.1.5:25568 }
+    - Dragons:
+        icon: minecraft.png
+        description: 192.168.1.5:25571
+        widget: { type: minecraft, url: udp://192.168.1.5:25571 }
+    - Cobblemon:
+        icon: minecraft.png
+        description: 192.168.1.5:25572
+        widget: { type: minecraft, url: udp://192.168.1.5:25572 }
+    - Better MC 4:
+        icon: minecraft.png
+        description: 192.168.1.5:25573
+        widget: { type: minecraft, url: udp://192.168.1.5:25573 }
+    - Create:
+        icon: minecraft.png
+        description: 192.168.1.5:25574
+        widget: { type: minecraft, url: udp://192.168.1.5:25574 }
+    - Bedrock Survival:
+        icon: minecraft.png
+        description: udp 19132 · Bedrock
+    - Bedrock Creative:
+        icon: minecraft.png
+        description: udp 19134 · Bedrock
+    - Palworld 1:
+        icon: palworld.png
+        description: udp 8211
+    - Palworld 3:
+        icon: palworld.png
+        description: udp 8219
+    - PhotoPrism:
+        icon: photoprism.png
+        href: http://192.168.1.5:2342
+        description: photos (not yet consolidated)
+        siteMonitor: http://192.168.1.5:2342
+    - File Browser:
+        icon: filebrowser.png
+        href: http://192.168.1.5:8085
+        siteMonitor: http://192.168.1.5:8085
+    - Ollama (Server-Rig):
+        icon: ollama.png
+        href: http://192.168.1.5:11434
+        description: 1× RTX 5060 on a x1 riser · ~15 tok/s
+        siteMonitor: http://192.168.1.5:11434
+    - Prometheus (old):
+        icon: prometheus.png
+        href: http://192.168.1.5:9090
+        description: MC-only stack · retire in phase 3
+        siteMonitor: http://192.168.1.5:9090
+        widget:
+          type: prometheus
+          url: http://192.168.1.5:9090
+    - Grafana (old):
+        icon: grafana.png
+        href: http://192.168.1.5:3000
+        description: retire in phase 3
+        siteMonitor: http://192.168.1.5:3000
+    - cAdvisor (old):
+        icon: cadvisor.png
+        href: http://192.168.1.5:8080
+        description: retire in phase 3
+        siteMonitor: http://192.168.1.5:8080
+    - Homepage (old):
+        icon: homepage.png
+        href: http://192.168.1.5:3005
+        description: retire in phase 2
+        siteMonitor: http://192.168.1.5:3005
+    - Homarr (old):
+        icon: homarr.png
+        href: http://192.168.1.5:7575
+        description: retire in phase 2
+        siteMonitor: http://192.168.1.5:7575
+
+- PlexBoy:
+    - healthwatch · PlexBoy:
+        icon: mdi-heart-pulse
+        description: 192.168.1.217 · Ryzen 7 5800X · 128 GB
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          mappings:
+            - field: hosts.2.cpuPct
+              label: CPU
+              format: percent
+            - field: hosts.2.memUsedPct
+              label: Mem used
+              format: percent
+            - field: hosts.2.disks.0.freePct
+              label: "C: free"
+              format: percent
+            - field: hosts.2.docker.containers
+              label: Containers
+              format: size
+    - Plex:
+        icon: plex.png
+        href: http://192.168.1.217:32400/web
+        description: native Windows tray app
+        siteMonitor: http://192.168.1.217:32400/identity
+        widget:
+          type: plex
+          url: {{HOMEPAGE_VAR_PLEX_URL}}
+          key: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+    - Media Manager:
+        icon: mdi-movie-open
+        href: http://192.168.1.217:45681
+        siteMonitor: http://192.168.1.217:45681
+    - Ollama (PlexBoy):
+        icon: ollama.png
+        href: http://192.168.1.217:11434
+        description: RTX 5060 · qwen3:8b ~72 tok/s
+        siteMonitor: http://192.168.1.217:11434
+    - Open WebUI:
+        icon: open-webui.png
+        href: http://192.168.1.217:3000
+        siteMonitor: http://192.168.1.217:3000
+    - n8n:
+        icon: n8n.png
+        href: http://192.168.1.217:5678
+        siteMonitor: http://192.168.1.217:5678
+    - Authentik:
+        icon: authentik.png
+        href: http://192.168.1.217:9000
+        description: SSO · phase 4 puts it in front of this page
+        siteMonitor: http://192.168.1.217:9000/-/health/live/
+    - Vaultwarden:
+        icon: vaultwarden.png
+        href: http://192.168.1.217:8222
+        siteMonitor: http://192.168.1.217:8222
+    - Obsidian Sync:
+        icon: couchdb.png
+        href: http://192.168.1.217:5984/_utils
+        siteMonitor: http://192.168.1.217:5984/_up
+    - Mission Control:
+        icon: mdi-rocket-launch
+        href: http://192.168.1.217:45680
+        description: OpenClaw-era dashboard, dormant
+        siteMonitor: http://192.168.1.217:45680
+    - SearXNG:
+        icon: searxng.png
+        description: bound to 127.0.0.1 on PlexBoy · not reachable from LAN
+    - Excalidraw:
+        icon: excalidraw.png
+        description: bound to 127.0.0.1 on PlexBoy · not reachable from LAN
+
+- pve & Network:
+    - Proxmox:
+        icon: proxmox.png
+        href: https://192.168.1.6:8006
+        description: i7-6700HQ · 16 GB · nginx-vm, hub, fibi, plausible
+        siteMonitor: https://192.168.1.6:8006
+        widget:
+          type: proxmox
+          url: {{HOMEPAGE_VAR_PROXMOX_URL}}
+          username: {{HOMEPAGE_VAR_PROXMOX_TOKEN_ID}}
+          password: {{HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET}}
+          node: pve
+    - Nginx Proxy Manager:
+        icon: nginx-proxy-manager.png
+        href: http://192.168.1.106:40081
+        description: nginx-vm · all external traffic
+        siteMonitor: http://192.168.1.106:40081
+    - UniFi (UDM Pro):
+        icon: unifi.png
+        href: https://192.168.1.1
+        description: gateway · flat LAN, VLANs pending
+        siteMonitor: https://192.168.1.1
+    - FIBI:
+        icon: mdi-airplane
+        href: https://alwaysbookit.com
+        description: LXC 100 · VLAN 20
+        siteMonitor: http://192.168.4.93:5050/
+    - Plausible:
+        icon: plausible.png
+        href: http://192.168.1.224:8000
+        description: LXC 101
+        siteMonitor: http://192.168.1.224:8000
+    - Scrypted:
+        icon: scrypted.png
+        href: https://192.168.1.61:10443
+        description: LXC 10443 · cameras
+        siteMonitor: https://192.168.1.61:10443
+    - Cloudflare DNS:
+        icon: cloudflare.png
+        href: https://dash.cloudflare.com
+        description: bookclub44.com · alwaysbookit.com
+
+- Hub:
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: http://192.168.1.141:3001
+        description: status page /status/homelab
+        server: hub
+        container: uptime-kuma
+        widget:
+          type: uptimekuma
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3001
+          slug: homelab
+    - Fleet:
+        icon: mdi-heart-pulse
+        href: http://192.168.1.141:3009/latest.json
+        description: healthwatch snapshot, every 5 min
+        server: hub
+        container: feed
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          mappings:
+            - field: overall
+              label: Overall
+            - field: warnCount
+              label: Warn
+              format: number
+            - field: critCount
+              label: Crit
+              format: number
+            - field: generatedAt
+              label: Sweep
+              format: relativeDate
+              style: short
+    - Alerts:
+        icon: mdi-alert-circle
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          display: dynamic-list
+          mappings:
+            items: alerts
+            name: host
+            label: msg
+            limit: 8
+    - Bake-off:
+        icon: mdi-scale-balance
+        description: H2 :3102 · H3 :3103 · G1 :3201 · G2 :3202 · G3 :3203
+        href: http://192.168.1.141:3102
+
+- BlueRig:
+    - healthwatch · BlueRig:
+        icon: mdi-heart-pulse
+        description: 192.168.1.67 · Ryzen 9 9900X · 32 GB · runs the agent
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          mappings:
+            - field: hosts.0.cpuPct
+              label: CPU
+              format: percent
+            - field: hosts.0.memUsedPct
+              label: Mem used
+              format: percent
+            - field: hosts.0.disks.0.freePct
+              label: "C: free"
+              format: percent
+            - field: hosts.0.uptimeHours
+              label: Up (h)
+              format: number
+    - GitHub:
+        icon: github.png
+        href: https://github.com/Bluewasabe
+    - Notion:
+        icon: notion.png
+        href: https://www.notion.so
+    - Plex (remote):
+        icon: plex.png
+        href: https://app.plex.tv
+    - Plausible (public):
+        icon: plausible.png
+        href: https://analytics.alwaysbookit.com
+
+- Paused & Retired:
+    - Hytale:
+        icon: mdi-gamepad-variant
+        description: paused · exit 143, 12 days · kids may want it back
+    - TubeIntel:
+        icon: mdi-youtube
+        description: paused · exit 137 (WSL memory ceiling) · revive when working it
+    - Palworld 2:
+        icon: palworld.png
+        description: retired 2026-09-15 · Palworld 3 replaces it
+    - OpenClaw:
+        icon: mdi-robot
+        description: retired · stopped 2026-08-11, preserved for revival

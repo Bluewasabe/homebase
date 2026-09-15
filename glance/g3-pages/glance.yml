@@ -1,0 +1,341 @@
+# G3 Pages — navigation as the organizing idea. One page per domain; Home is
+# the 3-second read, each other page is complete for its domain.
+server:
+  port: 8080
+
+theme:
+  background-color: 240 12 11
+  primary-color: 38 92 62
+  positive-color: 150 55 52
+  negative-color: 0 70 60
+  contrast-multiplier: 1.05
+
+pages:
+  - name: Home
+    columns:
+      - size: small
+        widgets:
+          - type: clock
+            hour-format: 12h
+          - type: weather
+            location: Philadelphia, Pennsylvania, United States
+            units: imperial
+            hour-format: 12h
+          - type: bookmarks
+            groups:
+              - title: Open most
+                links:
+                  - { title: Plex, url: "http://192.168.1.217:32400/web", icon: di:plex }
+                  - { title: Proxmox, url: "https://192.168.1.6:8006", icon: di:proxmox }
+                  - { title: Uptime Kuma, url: "http://192.168.1.141:3001", icon: di:uptime-kuma }
+                  - { title: Nginx Proxy Manager, url: "http://192.168.1.106:40081", icon: di:nginx-proxy-manager }
+                  - { title: UniFi, url: "https://192.168.1.1", icon: di:unifi }
+                  - { title: Open WebUI, url: "http://192.168.1.217:3000", icon: di:open-webui }
+                  - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+                  - { title: Vaultwarden, url: "http://192.168.1.217:8222", icon: di:vaultwarden }
+      - size: full
+        widgets:
+          - type: custom-api
+            title: Fleet
+            title-url: http://${HUB_IP}:3009/latest.json
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ $o := .JSON.String "overall" }}
+              <div class="flex justify-between text-center">
+                <div><div class="size-h1 {{ if eq $o "OK" }}color-positive{{ else if eq $o "CRIT" }}color-negative{{ else }}color-primary{{ end }}">{{ $o }}</div><div class="size-h6">FLEET</div></div>
+                <div><div class="size-h1 color-highlight">{{ .JSON.Int "warnCount" }}</div><div class="size-h6">WARN</div></div>
+                <div><div class="size-h1 color-highlight">{{ .JSON.Int "critCount" }}</div><div class="size-h6">CRIT</div></div>
+                <div><div class="size-h5 color-subdue" style="padding-top:10px">{{ .JSON.String "generatedAtLocal" }}</div><div class="size-h6">SWEEP</div></div>
+              </div>
+              <ul class="list list-gap-8 margin-top-15">
+              {{ range .JSON.Array "alerts" }}
+                <li><span class="{{ if eq (.String "sev") "crit" }}color-negative{{ else }}color-primary{{ end }}">{{ .String "host" }}</span> <span class="color-paragraph">{{ .String "msg" }}</span></li>
+              {{ end }}
+              </ul>
+          - type: custom-api
+            title: Hosts
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              <div class="flex flex-wrap gap-10">
+              {{ range .JSON.Array "hosts" }}
+                <div style="flex:1 1 140px" class="text-center">
+                  <div class="size-h4 color-highlight">{{ .String "name" }}</div>
+                  {{ if gt (.Int "memTotalGB") 0 }}
+                  <div class="size-h5 color-subdue">cpu {{ .Int "cpuPct" }}% · mem {{ .Int "memUsedPct" }}%</div>
+                  <div class="size-h5">{{ range .Array "disks" }}{{ $f := .Int "freePct" }}<span{{ if lt $f 10 }} class="color-negative"{{ else if lt $f 20 }} class="color-primary"{{ else }} class="color-subdue"{{ end }}>{{ .String "drive" }}{{ $f }} </span>{{ end }}</div>
+                  {{ else }}
+                  <div class="size-h5 {{ if .Bool "reachable" }}color-positive{{ else }}color-negative{{ end }}">{{ if .Bool "reachable" }}reachable{{ else }}down{{ end }}</div>
+                  {{ end }}
+                </div>
+              {{ end }}
+              </div>
+          - type: custom-api
+            title: Uptime Kuma · failing
+            title-url: http://${HUB_IP}:3001/status/homelab
+            cache: 1m
+            url: http://${HUB_IP}:3001/api/status-page/homelab
+            subrequests:
+              hb:
+                url: http://${HUB_IP}:3001/api/status-page/heartbeat/homelab
+            template: |
+              {{ $hb := .Subrequest "hb" }}
+              {{ $down := 0 }}{{ $up := 0 }}
+              <ul class="list list-gap-4">
+              {{ range .JSON.Array "publicGroupList" }}{{ range .Array "monitorList" }}
+                {{ $id := .Int "id" }}{{ $st := -1 }}
+                {{ range $hb.JSON.Array (printf "heartbeatList.%d" $id) }}{{ $st = .Int "status" }}{{ end }}
+                {{ if eq $st 0 }}{{ $down = add $down 1 }}<li class="color-negative size-h5">✖ {{ .String "name" }}</li>{{ else if eq $st 1 }}{{ $up = add $up 1 }}{{ end }}
+              {{ end }}{{ end }}
+              </ul>
+              <div class="size-h5 margin-top-10"><span class="color-positive">{{ $up }} up</span> · <span class="{{ if gt $down 0 }}color-negative{{ else }}color-subdue{{ end }}">{{ $down }} down</span></div>
+
+  - name: Games
+    columns:
+      - size: small
+        widgets:
+          - type: bookmarks
+            groups:
+              - title: Connect (Java)
+                links:
+                  - { title: "Vanilla · 192.168.1.5:25565", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "ATM 11 · :25566", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "All the Mons · :25567", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "ATM 10 · :25568", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Dragons · :25571", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Cobblemon · :25572", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Better MC 4 · :25573", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Create · :25574", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+              - title: Connect (other)
+                links:
+                  - { title: "Bedrock Survival · udp 19132", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Bedrock Creative · udp 19134", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Palworld 1 · udp 8211", url: "http://192.168.1.141:3001/status/homelab", icon: di:palworld }
+                  - { title: "Palworld 3 · udp 8219", url: "http://192.168.1.141:3001/status/homelab", icon: di:palworld }
+              - title: Paused / retired
+                color: 0 0 45
+                links:
+                  - { title: "Hytale (paused)", url: "http://192.168.1.141:3001/status/homelab", icon: mdi:gamepad-variant }
+                  - { title: "Palworld 2 (retired)", url: "http://192.168.1.141:3001/status/homelab", icon: di:palworld }
+      - size: full
+        widgets:
+          - type: custom-api
+            title: Game servers · Uptime Kuma
+            title-url: http://${HUB_IP}:3001/status/homelab
+            cache: 1m
+            url: http://${HUB_IP}:3001/api/status-page/homelab
+            subrequests:
+              hb:
+                url: http://${HUB_IP}:3001/api/status-page/heartbeat/homelab
+            template: |
+              {{ $hb := .Subrequest "hb" }}
+              {{ range .JSON.Array "publicGroupList" }}{{ if eq (.String "name") "Server-Rig" }}
+              <ul class="list list-gap-6">
+              {{ range .Array "monitorList" }}
+                {{ $id := .Int "id" }}{{ $st := -1 }}
+                {{ range $hb.JSON.Array (printf "heartbeatList.%d" $id) }}{{ $st = .Int "status" }}{{ end }}
+                <li class="flex justify-between size-h4"><span class="color-highlight">{{ .String "name" }}</span><span class="{{ if eq $st 1 }}color-positive{{ else if eq $st 0 }}color-negative{{ else }}color-subdue{{ end }}">{{ if eq $st 1 }}up{{ else if eq $st 0 }}DOWN{{ else if eq $st 2 }}pending{{ else }}paused{{ end }}</span></li>
+              {{ end }}
+              </ul>
+              {{ end }}{{ end }}
+          - type: custom-api
+            title: Server-Rig containers
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ range .JSON.Array "hosts" }}{{ if eq (.String "name") "Server-Rig" }}
+              <div class="size-h5 color-subdue margin-bottom-10">cpu {{ .Int "cpuPct" }}% · mem {{ .Int "memUsedPct" }}% of {{ .Int "memTotalGB" }} GB · {{ len (.Array "docker.containers") }} containers</div>
+              <ul class="list list-gap-4">
+              {{ range .Array "docker.containers" }}
+                {{ $h := .String "health" }}{{ $s := .String "state" }}
+                <li class="flex justify-between size-h5"><span class="color-highlight">{{ .String "name" }}</span><span class="{{ if ne $s "running" }}color-negative{{ else if eq $h "unhealthy" }}color-primary{{ else }}color-positive{{ end }}">{{ .String "status" }}</span></li>
+              {{ end }}
+              </ul>
+              {{ end }}{{ end }}
+
+  - name: Media
+    columns:
+      - size: small
+        widgets:
+          - type: custom-api
+            title: Plex · now playing
+            title-url: http://192.168.1.217:32400/web
+            cache: 30s
+            url: ${PLEX_URL}/status/sessions
+            headers:
+              Accept: application/json
+              X-Plex-Token: ${PLEX_TOKEN}
+            template: |
+              {{ $n := .JSON.Int "MediaContainer.size" }}
+              <div class="size-h3 {{ if gt $n 0 }}color-positive{{ else }}color-subdue{{ end }}">{{ $n }} stream{{ if ne $n 1 }}s{{ end }}</div>
+              <ul class="list list-gap-6 margin-top-10">
+              {{ range .JSON.Array "MediaContainer.Metadata" }}
+                <li class="size-h5"><span class="color-highlight">{{ .String "User.title" }}</span> · {{ .String "grandparentTitle" }} {{ .String "title" }}</li>
+              {{ end }}
+              </ul>
+          - type: bookmarks
+            groups:
+              - title: Media
+                links:
+                  - { title: Plex, url: "http://192.168.1.217:32400/web", icon: di:plex }
+                  - { title: Plex (remote), url: "https://app.plex.tv", icon: di:plex }
+                  - { title: PhotoPrism, url: "http://192.168.1.5:2342", icon: di:photoprism }
+                  - { title: Media Manager, url: "http://192.168.1.217:45681", icon: mdi:movie-open }
+                  - { title: File Browser, url: "http://192.168.1.5:8085", icon: di:filebrowser }
+                  - { title: Scrypted (cameras), url: "https://192.168.1.61:10443", icon: mdi:cctv }
+      - size: full
+        widgets:
+          - type: monitor
+            title: Media services
+            cache: 1m
+            sites:
+              - { title: Plex, url: "http://192.168.1.217:32400/web", check-url: "http://192.168.1.217:32400/identity", icon: di:plex }
+              - { title: PhotoPrism, url: "http://192.168.1.5:2342", icon: di:photoprism }
+              - { title: Media Manager, url: "http://192.168.1.217:45681", icon: mdi:movie-open }
+              - { title: File Browser, url: "http://192.168.1.5:8085", icon: di:filebrowser }
+              - { title: Scrypted, url: "https://192.168.1.61:10443", allow-insecure: true, icon: mdi:cctv }
+          - type: custom-api
+            title: PlexBoy disks
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ range .JSON.Array "hosts" }}{{ if eq (.String "name") "PlexBoy" }}
+              <ul class="list list-gap-6">
+              {{ range .Array "disks" }}{{ $f := .Int "freePct" }}
+                <li class="flex justify-between size-h5"><span class="color-highlight">{{ .String "drive" }} {{ .String "label" }}</span><span class="{{ if lt $f 10 }}color-negative{{ else if lt $f 20 }}color-primary{{ else }}color-subdue{{ end }}">{{ .Float "freeGB" | toInt }} GB free · {{ $f }}%</span></li>
+              {{ end }}
+              </ul>
+              {{ end }}{{ end }}
+
+  - name: AI
+    columns:
+      - size: small
+        widgets:
+          - type: bookmarks
+            groups:
+              - title: AI
+                links:
+                  - { title: Open WebUI, url: "http://192.168.1.217:3000", icon: di:open-webui }
+                  - { title: Ollama (PlexBoy), url: "http://192.168.1.217:11434", icon: di:ollama }
+                  - { title: Ollama (Server-Rig), url: "http://192.168.1.5:11434", icon: di:ollama }
+                  - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+      - size: full
+        widgets:
+          - type: monitor
+            title: AI services
+            cache: 1m
+            sites:
+              - { title: Open WebUI, url: "http://192.168.1.217:3000", icon: di:open-webui }
+              - { title: Ollama (PlexBoy), url: "http://192.168.1.217:11434", icon: di:ollama }
+              - { title: Ollama (Server-Rig), url: "http://192.168.1.5:11434", icon: di:ollama }
+              - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+          - type: custom-api
+            title: Models · PlexBoy
+            cache: 5m
+            url: http://192.168.1.217:11434/api/tags
+            template: |
+              <ul class="list list-gap-4">
+              {{ range .JSON.Array "models" }}
+                <li class="flex justify-between size-h5"><span class="color-highlight">{{ .String "name" }}</span><span class="color-subdue">{{ div (.Float "size") 1073741824 | toInt }} GB</span></li>
+              {{ end }}
+              </ul>
+
+  - name: Infra
+    columns:
+      - size: small
+        widgets:
+          - type: custom-api
+            title: Proxmox · pve
+            title-url: https://192.168.1.6:8006
+            cache: 1m
+            url: ${PROXMOX_URL}/api2/json/nodes/pve/status
+            allow-insecure: true
+            headers:
+              Authorization: PVEAPIToken=${PROXMOX_TOKEN_ID}=${PROXMOX_TOKEN_SECRET}
+            template: |
+              {{ $d := .JSON.Get "data" }}
+              {{ $cpu := mul ($d.Float "cpu") 100 | toInt }}
+              {{ $memPct := div (mul ($d.Float "memory.used") 100) ($d.Float "memory.total") | toInt }}
+              <div class="flex justify-between text-center">
+                <div><div class="size-h3 color-highlight">{{ $cpu }}%</div><div class="size-h6">CPU</div></div>
+                <div><div class="size-h3 {{ if ge $memPct 90 }}color-negative{{ else }}color-highlight{{ end }}">{{ $memPct }}%</div><div class="size-h6">MEM</div></div>
+                <div><div class="size-h3 color-highlight">{{ div ($d.Int "uptime") 86400 }}d</div><div class="size-h6">UP</div></div>
+              </div>
+          - type: server-stats
+            servers:
+              - type: local
+                name: hub
+          - type: bookmarks
+            groups:
+              - title: Infra
+                links:
+                  - { title: Proxmox, url: "https://192.168.1.6:8006", icon: di:proxmox }
+                  - { title: Nginx Proxy Manager, url: "http://192.168.1.106:40081", icon: di:nginx-proxy-manager }
+                  - { title: UniFi (UDM Pro), url: "https://192.168.1.1", icon: di:unifi }
+                  - { title: Authentik, url: "http://192.168.1.217:9000", icon: di:authentik }
+                  - { title: Vaultwarden, url: "http://192.168.1.217:8222", icon: di:vaultwarden }
+                  - { title: Uptime Kuma, url: "http://192.168.1.141:3001", icon: di:uptime-kuma }
+                  - { title: Cloudflare, url: "https://dash.cloudflare.com", icon: di:cloudflare }
+              - title: Old stack (retiring)
+                color: 0 0 45
+                links:
+                  - { title: Grafana (old), url: "http://192.168.1.5:3000", icon: di:grafana }
+                  - { title: Prometheus (old), url: "http://192.168.1.5:9090", icon: di:prometheus }
+                  - { title: cAdvisor (old), url: "http://192.168.1.5:8080", icon: mdi:chart-box-outline }
+                  - { title: Homepage (old), url: "http://192.168.1.5:3005", icon: mdi:view-dashboard }
+                  - { title: Homarr (old), url: "http://192.168.1.5:7575", icon: mdi:view-dashboard-outline }
+      - size: full
+        widgets:
+          - type: monitor
+            title: Infra services
+            cache: 1m
+            sites:
+              - { title: Proxmox, url: "https://192.168.1.6:8006", allow-insecure: true, icon: di:proxmox }
+              - { title: Nginx Proxy Manager, url: "http://192.168.1.106:40081", icon: di:nginx-proxy-manager }
+              - { title: UniFi, url: "https://192.168.1.1", allow-insecure: true, icon: di:unifi }
+              - { title: Authentik, url: "http://192.168.1.217:9000", check-url: "http://192.168.1.217:9000/-/health/live/", icon: di:authentik }
+              - { title: Vaultwarden, url: "http://192.168.1.217:8222", icon: di:vaultwarden }
+              - { title: Uptime Kuma, url: "http://192.168.1.141:3001", icon: di:uptime-kuma }
+          - type: docker-containers
+            title: hub containers
+            hide-by-default: false
+
+  - name: Business & Dev
+    columns:
+      - size: small
+        widgets:
+          - type: bookmarks
+            groups:
+              - title: Business
+                links:
+                  - { title: FIBI, url: "https://alwaysbookit.com", icon: mdi:airplane }
+                  - { title: Plausible, url: "http://192.168.1.224:8000", icon: di:plausible }
+                  - { title: Plausible (public), url: "https://analytics.alwaysbookit.com", icon: di:plausible }
+                  - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+                  - { title: Notion, url: "https://www.notion.so", icon: di:notion }
+              - title: Dev
+                links:
+                  - { title: GitHub, url: "https://github.com/Bluewasabe", icon: si:github }
+                  - { title: Obsidian Sync, url: "http://192.168.1.217:5984/_utils", icon: di:couchdb }
+                  - { title: Mission Control, url: "http://192.168.1.217:45680", icon: mdi:rocket-launch }
+                  - { title: "TubeIntel (paused)", url: "http://192.168.1.141:3001/status/homelab", icon: mdi:youtube }
+      - size: full
+        widgets:
+          - type: monitor
+            title: Business & dev services
+            cache: 1m
+            sites:
+              - { title: FIBI, url: "https://alwaysbookit.com", check-url: "http://192.168.4.93:5050/", icon: mdi:airplane }
+              - { title: Plausible, url: "http://192.168.1.224:8000", icon: di:plausible }
+              - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+              - { title: Obsidian Sync, url: "http://192.168.1.217:5984/_utils", check-url: "http://192.168.1.217:5984/_up", alt-status-codes: [401], icon: di:couchdb }
+              - { title: Mission Control, url: "http://192.168.1.217:45680", icon: mdi:rocket-launch }
+          - type: releases
+            title: Watching
+            cache: 12h
+            repositories:
+              - glanceapp/glance
+              - gethomepage/homepage
+              - louislam/uptime-kuma
+              - itzg/docker-minecraft-server

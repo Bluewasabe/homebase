@@ -1,0 +1,60 @@
+# Machines the home base watches. Keep in sync with healthwatch/config.json.
+- name: hub
+  ip: 192.168.1.141
+  kind: lxc
+  os: debian12
+  parent: pve
+  ssh: root
+  note: LXC 110 on pve. Runs everything in this repo. DHCP lease; reservation on UDM Pro pending.
+- name: BlueRig
+  ip: 192.168.1.67
+  kind: windows
+  ssh: Bluew
+  note: Primary dev machine. Runs healthwatch. Docker Desktop stopped by default.
+- name: PlexBoy
+  ip: 192.168.1.217
+  kind: windows
+  ssh: Bluew
+  note: Plex (native, tray app), Ollama 2x GPU, Authentik, n8n, Vaultwarden.
+- name: Server-Rig
+  ip: 192.168.1.5
+  kind: windows
+  ssh: rack
+  note: Game fleet, PhotoPrism. WSL mirrored networking; every new port needs a Hyper-V firewall rule.
+- name: pve
+  ip: 192.168.1.6
+  kind: proxmox
+  ssh: root
+  note: Proxmox hypervisor. Hosts nginx-vm, hub, fibi, plausible, scrypted, rustdesk.
+- name: nginx-vm
+  ip: 192.168.1.106
+  kind: vm
+  parent: pve
+  ssh: ubuntu
+  note: Nginx Proxy Manager. All external traffic enters here.
+- name: fibi
+  ip: 192.168.4.93
+  kind: lxc
+  parent: pve
+  ssh: root
+  note: LXC 100, VLAN 20. alwaysbookit.com.
+- name: plausible
+  ip: 192.168.1.224
+  kind: lxc
+  parent: pve
+  ssh: root
+  note: LXC 101. analytics.alwaysbookit.com.
+- name: scrypted
+  ip: 192.168.1.61
+  kind: lxc
+  parent: pve
+  note: LXC 10443. Camera hub.
+- name: rustdesk
+  ip: 192.168.1.183
+  kind: lxc
+  parent: pve
+  note: LXC 102. RustDesk relay, not fully configured.
+- name: udm
+  ip: 192.168.1.1
+  kind: network
+  note: UDM Pro gateway. UniFi read-only user pending (Chris).

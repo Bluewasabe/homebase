@@ -1,0 +1,6 @@
+- datetime:
+    text_size: lg
+    format:
+      dateStyle: short
+      timeStyle: short
+      hour12: true

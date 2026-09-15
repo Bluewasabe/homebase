@@ -1,0 +1,14 @@
+- Repos:
+    - homebase:
+        - abbr: HB
+          href: https://github.com/Bluewasabe/homebase
+    - fibi:
+        - abbr: FB
+          href: https://github.com/Bluewasabe/fibi
+- Docs:
+    - Homepage:
+        - abbr: HP
+          href: https://gethomepage.dev
+    - Uptime Kuma:
+        - abbr: UK
+          href: https://github.com/louislam/uptime-kuma/wiki
