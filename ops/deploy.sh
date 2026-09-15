@@ -10,7 +10,7 @@ set -euo pipefail
 HUB="${HUB:-root@192.168.1.141}"
 REMOTE=/opt/homebase
 STACKS=("$@")
-[ ${#STACKS[@]} -eq 0 ] && STACKS=(feed uptime-kuma bakeoff)
+[ ${#STACKS[@]} -eq 0 ] && STACKS=(feed uptime-kuma bakeoff custom)
 cd "$(dirname "$0")/.."
 
 echo "==> shipping tracked files to $HUB:$REMOTE"
@@ -23,7 +23,7 @@ git ls-files -z | tar --null --owner=0 --group=0 -czf - -T - | ssh "$HUB" "
 
 for s in "${STACKS[@]}"; do
   echo "==> compose up: $s"
-  ssh "$HUB" "cd $REMOTE/compose/$s && docker compose --env-file $REMOTE/.env up -d --remove-orphans --quiet-pull"
+  ssh "$HUB" "cd $REMOTE/compose/$s && docker compose --env-file $REMOTE/.env up -d --build --remove-orphans --quiet-pull"
 done
 
 # Homepage 2.x serves a statically generated page and re-reads settings.yaml only

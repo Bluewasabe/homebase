@@ -141,3 +141,20 @@ The two ideas that survived contact were **H3's "alerts, then eight links"** for
 ops data**, but at the cost of owning Go templates; **G3** is the better Glance pick because
 the Home page is calm and the Games page is the best game-server view of the six. If you want
 one answer: H2 for the desk, and lift H3's Fleet/Alerts/Top-8 block to the top of it.
+
+---
+
+## Addendum — three from-scratch variants (same day, on request)
+
+Built with no dashboard product underneath: static HTML + JS in `custom/`, one nginx that proxies
+the feed, Uptime Kuma, Proxmox and Plex on the same origin (secrets injected server-side), and an
+`mcstatus` sidecar that does a real Minecraft/Bedrock handshake for player counts.
+
+| Port | Variant | Idea | Screens |
+|---|---|---|---|
+| 3301 | **C1 Flight Deck** | Aircraft annunciator panel + engine gauges per host + nav scope of services. B612 (Airbus cockpit font). | `c1-flight-deck-*.jpg` |
+| 3302 | **C2 Rack Elevation** | The lab as a literal rack: drive bays that fill, an LED per container, patch panel of links. | `c2-rack-*.jpg` |
+| 3303 | **C3 Transit Map** | One line per machine, stations are tools, interchange for Ollama, departure board for delays. | `c3-transit-*.jpg` |
+
+Full write-up with screenshots: https://claude.ai/artifact/WHNeZyteFE9ZffZEx5Bh5U
+Trade: zero effort to add a service (inventory only), real effort to add a new widget type (you write it), zero upstream.

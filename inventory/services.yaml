@@ -86,6 +86,9 @@
 - {name: g1-feed,             label: G1 Feed,        host: hub, kind: http, url: "http://192.168.1.141:3201", port: 3201, status: live, fn: infra, kuma: http, link: false}
 - {name: g2-ops,              label: G2 Ops,         host: hub, kind: http, url: "http://192.168.1.141:3202", port: 3202, status: live, fn: infra, kuma: http, link: false}
 - {name: g3-pages,            label: G3 Pages,       host: hub, kind: http, url: "http://192.168.1.141:3203", port: 3203, status: live, fn: infra, kuma: http, link: false}
+- {name: c1-flight-deck,      label: C1 Flight Deck, host: hub, kind: http, url: "http://192.168.1.141:3301", port: 3301, status: live, fn: infra, kuma: http, link: false}
+- {name: c2-rack,             label: C2 Rack,        host: hub, kind: http, url: "http://192.168.1.141:3302", port: 3302, status: live, fn: infra, kuma: http, link: false}
+- {name: c3-transit,          label: C3 Transit,     host: hub, kind: http, url: "http://192.168.1.141:3303", port: 3303, status: live, fn: infra, kuma: http, link: false}
 
 # ---------------------------------------------------------------- cloud links (no monitor)
 - {name: github,              label: GitHub,         host: cloud, kind: link, url: "https://github.com/Bluewasabe", status: live, fn: dev, icon: github.png, kuma: none}

@@ -17,6 +17,12 @@ for p in sorted((ROOT / "homepage").glob("*/")):
     variants[p.name] = "".join(f.read_text(encoding="utf-8") for f in p.glob("*.yaml"))
 for p in sorted((ROOT / "glance").glob("*/")):
     variants[p.name] = (p / "glance.yml").read_text(encoding="utf-8")
+# from-scratch variants render window.HB_SERVICES (generated from inventory), so the
+# check is that the generated file is current and each page loads it
+gen = ROOT / "custom/shared/services.js"
+for p in sorted((ROOT / "custom").glob("c*/")):
+    page = (p / "index.html").read_text(encoding="utf-8")
+    variants[p.name] = gen.read_text(encoding="utf-8") if "/shared/services.js" in page else ""
 
 if not variants:
     print("no variant configs found")

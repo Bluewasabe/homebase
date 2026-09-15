@@ -1,6 +1,6 @@
 """Build the shareable bake-off page: inline every screenshot as a data URI.
 
-Run:  python docs/artifact/build.py [out.html]
+Run:  python docs/artifact/build.py [out.html] [template.html]
 """
 import base64
 import pathlib
@@ -9,7 +9,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 SHOTS = ROOT / "docs/screenshots/phase-1"
-tpl = (ROOT / "docs/artifact/template.html").read_text(encoding="utf-8")
+tpl_path = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "docs/artifact/template.html"
+tpl = tpl_path.read_text(encoding="utf-8")
 
 
 def inline(m):

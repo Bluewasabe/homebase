@@ -1,0 +1,57 @@
+# Three from-scratch front doors (static HTML + JS) behind one nginx that also
+# proxies the data sources on the same origin, so the pages need no CORS and
+# no secrets: /feed/ /kuma/ /pve/ /plex/ /mc/
+#
+#   3301 c1-flight-deck   3302 c2-rack   3303 c3-transit
+services:
+  custom:
+    image: nginx:alpine
+    container_name: custom
+    restart: unless-stopped
+    ports:
+      - "3301:3301"
+      - "3302:3302"
+      - "3303:3303"
+    environment:
+      HUB_IP: ${HUB_IP}
+      PROXMOX_URL: ${PROXMOX_URL}
+      PROXMOX_TOKEN_ID: ${PROXMOX_TOKEN_ID}
+      PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET}
+      PLEX_URL: ${PLEX_URL}
+      PLEX_TOKEN: ${PLEX_TOKEN}
+    volumes:
+      - ../../custom:/usr/share/nginx/html:ro
+      - ./nginx:/etc/nginx/templates:ro
+    depends_on:
+      - mcstatus
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3301/"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  mcstatus:
+    build: ./mcstatus
+    image: homebase/mcstatus:local
+    container_name: mcstatus
+    restart: unless-stopped
+    expose:
+      - "8000"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 96M

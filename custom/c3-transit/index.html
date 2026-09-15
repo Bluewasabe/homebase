@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transit · Homebase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+  :root {
+    --paper: #F4F6F8; --card: #FFFFFF; --ink: #1B1F24; --dim: #5E6975; --rule: #D6DCE3; --grid: #E9EDF1;
+    --l-serverrig: #E4002B; --l-plexboy: #0058C9; --l-pve: #00A651; --l-hub: #7B2CBF; --l-cloud: #6C757D; --l-bluerig: #F2A900;
+    --up: #FFFFFF; --down: #E4002B; --paused: #C7CED6; --board: #1B1F24; --board-ink: #F7D774; --board-dim: #8E8A6E;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #12151A; --card: #1A1F26; --ink: #E7ECF1; --dim: #97A3B0; --rule: #2C343D; --grid: #1D232A; --up: #1A1F26; --paused: #3A434D; --l-plexboy: #4C8DFF; --l-pve: #2ED47A; --l-hub: #B07CF0; --l-cloud: #8A949E; } }
+  :root[data-theme="dark"] { --paper: #12151A; --card: #1A1F26; --ink: #E7ECF1; --dim: #97A3B0; --rule: #2C343D; --grid: #1D232A; --up: #1A1F26; --paused: #3A434D; --l-plexboy: #4C8DFF; --l-pve: #2ED47A; --l-hub: #B07CF0; --l-cloud: #8A949E; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 15px/1.45 "Overpass", system-ui, sans-serif; padding-inline: 18px; padding-block: 14px 30px; }
+  a { color: inherit; }
+  .wrap { display: grid; gap: 16px; max-width: 1400px; margin: 0 auto; }
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+  .head h1 { margin: 0; font: 800 26px "Overpass", sans-serif; letter-spacing: -.01em; }
+  .head h1 span { color: var(--dim); font-weight: 400; }
+  .head .m { font-family: "Overpass Mono", monospace; font-size: 13px; color: var(--dim); }
+
+  /* departure board */
+  .board { background: var(--board); color: var(--board-ink); border-radius: 6px; padding: 12px 16px; display: grid; grid-template-columns: 1fr auto; gap: 6px 24px; font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 20px; letter-spacing: .04em; text-transform: uppercase; }
+  .board .row { display: grid; grid-template-columns: 120px 1fr auto; gap: 16px; border-bottom: 1px solid #ffffff14; padding: 3px 0; }
+  .board .row:last-child { border-bottom: 0; }
+  .board .k { color: var(--board-dim); font-size: 14px; letter-spacing: .12em; align-self: center; }
+  .board .delay { color: #FF6B5B; }
+  .board .ok { color: #7BE3A1; }
+  .board .clock { font-size: 34px; line-height: 1; text-align: right; font-variant-numeric: tabular-nums; }
+  .board .clock small { display: block; font-size: 13px; color: var(--board-dim); letter-spacing: .12em; }
+  @media (max-width: 720px) { .board { grid-template-columns: 1fr; } .board .row { grid-template-columns: 80px 1fr; } .board .row > :last-child { display: none; } }
+
+  .mapwrap { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; overflow-x: auto; }
+  svg { display: block; min-width: 900px; }
+  .st { cursor: pointer; }
+  .st text { font: 600 11.5px "Overpass", sans-serif; fill: var(--ink); }
+  .st.down text { fill: var(--down); }
+  .st.paused text { fill: var(--dim); }
+  .st:hover text { text-decoration: underline; }
+  .zone { fill: var(--grid); }
+  .zone-label { font: 700 12px "Barlow Condensed", sans-serif; letter-spacing: .14em; fill: var(--dim); text-transform: uppercase; }
+  .line-label { font: 700 12px "Overpass", sans-serif; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--dim); align-items: center; }
+  .legend i { display: inline-block; width: 22px; height: 6px; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+  .legend .st-i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--ink); background: var(--up); vertical-align: middle; margin-right: 6px; }
+  .legend .st-i.down { border-color: var(--down); background: var(--down); }
+  .legend .st-i.paused { border-color: var(--paused); background: var(--paused); }
+
+  .below { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; }
+  .card h2 { margin: 0 0 8px; font: 700 13px "Barlow Condensed", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+  .card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-family: "Overpass Mono", monospace; font-size: 13px; }
+  .card li { display: flex; justify-content: space-between; gap: 10px; }
+  .card li b { font-weight: 600; }
+  .bar { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; margin-top: 3px; }
+  .bar i { display: block; height: 100%; background: var(--l-pve); }
+  .bar i.warn { background: var(--l-bluerig); } .bar i.crit { background: var(--l-serverrig); }
+  :focus-visible { outline: 2px solid var(--l-plexboy); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><h1>Transit <span>· Homebase network map</span></h1><span class="m">one line per machine · stations are tools · click to ride</span><span class="m" id="stamp"></span></div>
+
+  <div class="board" aria-live="polite">
+    <div id="board-rows"></div>
+    <div class="clock"><span id="clock">--:--</span><small>SERVICE STATUS</small></div>
+  </div>
+
+  <div class="mapwrap"><svg id="map" viewBox="0 0 1360 560" role="img" aria-label="Network map: one line per machine, one station per service; a red station is down."></svg></div>
+  <div class="legend" id="legend"></div>
+
+  <div class="below">
+    <div class="card"><h2>Now boarding · game servers</h2><ul id="games"></ul></div>
+    <div class="card"><h2>Now playing · Plex</h2><ul id="plex"></ul></div>
+    <div class="card"><h2>Platform capacity · disks</h2><ul id="disks"></ul></div>
+    <div class="card"><h2>Rolling stock · hosts</h2><ul id="hosts"></ul></div>
+  </div>
+</div>
+
+<script src="/shared/services.js"></script>
+<script src="/shared/data.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LINES = [
+  { host: 'Server-Rig', color: 'var(--l-serverrig)', label: 'Server-Rig line' },
+  { host: 'PlexBoy', color: 'var(--l-plexboy)', label: 'PlexBoy line' },
+  { host: 'pve', color: 'var(--l-pve)', label: 'pve line', also: ['nginx-vm', 'fibi', 'plausible', 'scrypted', 'rustdesk', 'udm'] },
+  { host: 'hub', color: 'var(--l-hub)', label: 'hub line' },
+  { host: 'cloud', color: 'var(--l-cloud)', label: 'cloud line', dashed: true },
+];
+const ZONES = ['media', 'games', 'ai', 'infra', 'business', 'dev', 'family'];
+setInterval(() => $('#clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 1000);
+
+function lineOf(s) { return LINES.find(l => l.host === s.host || (l.also || []).includes(s.host)); }
+
+function renderMap(d) {
+  const W = 1360, H = 560, left = 200, right = 30, top = 70, gap = 88;
+  const svc = HB.services.filter(s => s.status !== 'retired' && s.link !== false && (s.url || s.kind === 'game-mc' || s.kind === 'game-udp'));
+  // zone bands: width proportional to max stations of any line in that zone
+  const counts = ZONES.map(z => Math.max(1, ...LINES.map(l => svc.filter(s => s.fn === z && lineOf(s) === l).length)));
+  const total = counts.reduce((a, b) => a + b, 0);
+  const usable = W - left - right; let x = left; const zoneX = {};
+  ZONES.forEach((z, i) => { const w = usable * counts[i] / total; zoneX[z] = { x, w }; x += w; });
+  let out = '';
+  ZONES.forEach((z, i) => { const { x, w } = zoneX[z]; out += `<rect class="zone" x="${x + 3}" y="${top - 40}" width="${w - 6}" height="${H - top + 10}" rx="6" opacity="${i % 2 ? .55 : 1}"/><text class="zone-label" x="${x + w / 2}" y="${top - 22}" text-anchor="middle">${z}</text>`; });
+  const stations = [];
+  LINES.forEach((l, li) => {
+    const y = top + li * gap + 30;
+    const pts = [[left - 60, y]];
+    ZONES.forEach(z => {
+      const list = svc.filter(s => s.fn === z && lineOf(s) === l);
+      const { x, w } = zoneX[z];
+      list.forEach((s, i) => { const sx = x + w * (i + 1) / (list.length + 1); pts.push([sx, y]); stations.push({ s, x: sx, y, line: l, i, n: list.length }); });
+    });
+    pts.push([W - right + 10, y]);
+    out += `<path d="M${pts.map(p => p.join(',')).join(' L')}" stroke="${l.color}" stroke-width="8" fill="none" stroke-linecap="round" ${l.dashed ? 'stroke-dasharray="14 10"' : ''}/>`;
+    out += `<text class="line-label" x="${left - 190}" y="${y + 4}" fill="${l.color}">${l.label}</text>`;
+  });
+  // interchange: Ollama on PlexBoy + Server-Rig
+  const oa = stations.find(t => t.s.name === 'ollama-serverrig'), ob = stations.find(t => t.s.name === 'ollama-plexboy');
+  if (oa && ob) out += `<path d="M${oa.x},${oa.y} C${oa.x},${(oa.y + ob.y) / 2} ${ob.x},${(oa.y + ob.y) / 2} ${ob.x},${ob.y}" stroke="var(--ink)" stroke-width="3" fill="none" opacity=".35" stroke-dasharray="4 4"/>`;
+  stations.forEach(t => {
+    let st = HB.serviceStatus(t.s);
+    if (t.s.kind === 'game-udp' && t.s.status === 'live' && !d.mc.find(m => m.name === t.s.name)) { const c = HB.host(t.s.host)?.docker?.containers?.find(c => c.name === t.s.name); st = c ? (c.state === 'running' ? 'up' : 'down') : st; }
+    const cls = st === 'down' ? 'down' : (st === 'paused' || st === 'pending') ? 'paused' : '';
+    const fill = st === 'down' ? 'var(--down)' : st === 'paused' || st === 'pending' ? 'var(--paused)' : 'var(--up)';
+    const stroke = st === 'down' ? 'var(--down)' : t.line.color;
+    const g = d.mc.find(m => m.name === t.s.name);
+    const label = esc(t.s.label) + (g && g.online ? ` (${g.players})` : '');
+    const above = t.i % 2 === 0;
+    const ly = above ? t.y - 16 - (t.i % 4 === 2 ? 14 : 0) : t.y + 26 + (t.i % 4 === 3 ? 14 : 0);
+    const href = t.s.url ? `href="${esc(t.s.url)}" target="_blank" rel="noopener"` : 'href="/kuma/status/homelab" target="_blank"';
+    out += `<a class="st ${cls}" ${href}><title>${esc(t.s.label)} · ${esc(t.s.host)} · ${st}${t.s.note ? ' · ' + esc(t.s.note) : ''}</title>
+      <circle cx="${t.x}" cy="${t.y}" r="${st === 'down' ? 9 : 7}" fill="${fill}" stroke="${stroke}" stroke-width="3.5"/>
+      ${st === 'down' ? `<path d="M${t.x - 4},${t.y - 4} L${t.x + 4},${t.y + 4} M${t.x + 4},${t.y - 4} L${t.x - 4},${t.y + 4}" stroke="#fff" stroke-width="2"/>` : ''}
+      <text x="${t.x}" y="${ly}" text-anchor="middle" transform="rotate(${above ? -22 : 22} ${t.x} ${ly})">${label}</text></a>`;
+  });
+  $('#map').innerHTML = out;
+  $('#legend').innerHTML = LINES.map(l => `<span><i style="background:${l.color};${l.dashed ? 'opacity:.6' : ''}"></i>${l.label}</span>`).join('') + `<span><span class="st-i"></span>in service</span><span><span class="st-i down"></span>down</span><span><span class="st-i paused"></span>paused / pending</span><span>(n) = players online</span>`;
+}
+
+function renderBoard(d) {
+  const f = d.feed; const rows = [];
+  const down = Object.values(d.kuma.byName).filter(m => m.status === 'down');
+  const off = d.mc.filter(g => !g.online);
+  for (const a of f?.alerts || []) rows.push(['delay', a.host, a.msg]);
+  for (const m of down) rows.push(['delay', m.name.split(' · ')[0], `${m.name.split(' · ')[1]} not answering`]);
+  for (const g of off) rows.push(['delay', 'Server-Rig', `${g.label} offline`]);
+  if (!rows.length) rows.push(['ok', 'all lines', 'good service on all lines']);
+  const html = rows.slice(0, 8).map(([c, k, m]) => `<div class="row"><span class="k">${esc(k)}</span><span class="${c === 'delay' ? 'delay' : 'ok'}">${esc(m)}</span><span class="k">${c === 'delay' ? 'DELAY' : 'GOOD SERVICE'}</span></div>`).join('');
+  $('#board-rows').innerHTML = html + `<div class="row"><span class="k">feed</span><span>${f ? esc(f.overall) + ' · swept ' + HB.fmtAgo(f.generatedAt) : 'no feed'}</span><span class="k">${Object.values(d.kuma.byName).filter(m => m.status === 'up').length}/${Object.keys(d.kuma.byName).length} monitors up</span></div>`;
+  $('#stamp').textContent = 'refreshed ' + d.at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderCards(d) {
+  $('#games').innerHTML = d.mc.slice().sort((a, b) => b.players - a.players).map(g => `<li><span>${esc(g.label)} <span style="color:var(--dim)">:${g.port}</span></span><b style="color:${g.online ? 'inherit' : 'var(--down)'}">${g.online ? g.players + ' / ' + g.max : 'offline'}</b></li>`).join('');
+  $('#plex').innerHTML = d.plex ? (d.plex.sessions.length ? d.plex.sessions.map(s => `<li><span>${esc(s.user)} · ${esc(s.title)}</span><b>${esc(s.state)}</b></li>`).join('') : '<li><span style="color:var(--dim)">nobody watching</span><b>0</b></li>') : '<li>no data</li>';
+  const disks = []; for (const h of d.feed?.hosts || []) for (const dk of h.disks || []) disks.push({ h: h.name, ...dk });
+  disks.sort((a, b) => a.freePct - b.freePct);
+  $('#disks').innerHTML = disks.slice(0, 8).map(dk => `<li style="display:block"><div style="display:flex;justify-content:space-between"><span>${esc(dk.h)} ${esc(dk.drive)} <span style="color:var(--dim)">${esc(dk.label)}</span></span><b>${dk.freePct}% free</b></div><div class="bar"><i class="${dk.freePct < 10 ? 'crit' : dk.freePct < 20 ? 'warn' : ''}" style="width:${100 - dk.freePct}%"></i></div></li>`).join('');
+  $('#hosts').innerHTML = (d.feed?.hosts || []).map(h => `<li><span>${esc(h.name)} <span style="color:var(--dim)">${esc(h.ip)}</span></span><b style="color:${h.reachable ? 'inherit' : 'var(--down)'}">${h.reachable ? (h.cpuPct != null ? `cpu ${h.cpuPct}% · mem ${h.memUsedPct}% · ${(h.docker?.containers || []).length} ctr` : 'reachable') : 'down'}</b></li>`).join('') + (d.pve ? `<li><span>pve <span style="color:var(--dim)">192.168.1.6</span></span><b>cpu ${d.pve.cpu}% · mem ${d.pve.memPct}% · ${d.pve.guests.filter(g => g.status === 'running').length}/${d.pve.guests.length} guests</b></li>` : '');
+}
+
+async function refresh() {
+  try { const d = await HB.load(); renderBoard(d); renderMap(d); renderCards(d); }
+  catch (e) { $('#board-rows').innerHTML = `<div class="row"><span class="k">system</span><span class="delay">data link lost · ${esc(e.message)}</span></div>`; }
+}
+refresh(); setInterval(refresh, 60000);
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
  * Screenshot every front-door variant (and the Uptime Kuma status page) at
  * desktop and phone size. Evidence for docs/comparison.md and every phase PR.
  *
- *   node ops/shoot.mjs [outDir] [hubIp]
+ *   node ops/shoot.mjs [outDir] [hubIp] [name,name]
  *   node ops/shoot.mjs docs/screenshots/phase-1 192.168.1.141
  *
  * Full-page JPEG q85 (a DPR-2 phone PNG is ~1 MB; these get committed).
@@ -15,7 +15,8 @@ const OUT = process.argv[2] || 'docs/screenshots/phase-1';
 const HUB = process.argv[3] || '192.168.1.141';
 fs.mkdirSync(OUT, { recursive: true });
 
-const TARGETS = [
+const ONLY = (process.argv[4] || '').split(',').filter(Boolean);
+const TARGETS_ALL = [
   { name: 'h1-console', url: `http://${HUB}:3101/` },
   { name: 'h2-rack',    url: `http://${HUB}:3102/` },
   { name: 'h3-pocket',  url: `http://${HUB}:3103/` },
@@ -23,8 +24,12 @@ const TARGETS = [
   { name: 'g2-ops',     url: `http://${HUB}:3202/` },
   { name: 'g3-pages',   url: `http://${HUB}:3203/` },
   { name: 'g3-games',   url: `http://${HUB}:3203/games` },
+  { name: 'c1-flight-deck', url: `http://${HUB}:3301/` },
+  { name: 'c2-rack',    url: `http://${HUB}:3302/` },
+  { name: 'c3-transit', url: `http://${HUB}:3303/` },
   { name: 'kuma-status', url: `http://${HUB}:3001/status/homelab` },
 ];
+const TARGETS = ONLY.length ? TARGETS_ALL.filter(t => ONLY.includes(t.name)) : TARGETS_ALL;
 const VIEWPORTS = {
   desktop: { width: 1440, height: 900, deviceScaleFactor: 1 },
   mobile:  { width: 390,  height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
