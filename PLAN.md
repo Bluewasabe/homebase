@@ -54,7 +54,7 @@ Plan (phases 0+1): `docs/superpowers/plans/2026-09-15-phase-0-1-bakeoff.md`
 - **File Browser on Server-Rig is broken**: compose publishes 8085→85 but the app listens on 80
 
 ### Phase 1 — Lessons Learned
-- Homepage 2.3.0 ignores the map form of `layout:` in settings.yaml; use the list form (`- Group:`).
+- Homepage 2.x serves a statically generated page: settings.yaml (layout, theme, title) only take effect after `POST /api/revalidate`. A real browser triggers it via `/api/hash`; headless screenshots and fresh visitors do not. `ops/deploy.sh` now forces it after every deploy. (First diagnosis blamed the `layout:` map form; both forms work.)
 - Homepage YAML: a label like `C: free` needs quotes (colon-space starts a mapping).
 - PowerShell `Set-Content -Encoding UTF8` writes a BOM; `JSON.parse` and gjson both reject it. Write feed files with `[Text.UTF8Encoding]::new($false)`.
 - Uptime Kuma `accepted_statuscodes` only takes the fixed buckets (`200-299`, `300-399`, …). CouchDB answers 401 everywhere, so its monitor accepts `400-499`.
