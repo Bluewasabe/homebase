@@ -3,3 +3,8 @@
 **/data/
 *.log
 node_modules/
+docs/artifact/bakeoff.html
+docs/artifact/custom-three.html
+
+# local backups made before edits
+*.bak-*

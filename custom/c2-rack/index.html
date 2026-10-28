@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rack · Homebase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Share+Tech+Mono&display=swap">
+<style>
+  :root {
+    --room: #101214; --steel: #1B1F23; --face: #23282E; --face-2: #2B3138; --rail: #3D444C; --edge: #4A525B;
+    --ink: #D7DCE1; --dim: #8C96A0; --tape: #E9E4D6; --tape-ink: #15171A;
+    --g: #3DDC84; --a: #F5A524; --r: #F04438; --b: #4CC2FF; --off: #2A3037;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--room); color: var(--ink); }
+  body { font: 14px/1.4 "Saira Condensed", system-ui, sans-serif; padding-inline: 18px; padding-block: 14px 30px;
+    background-image: linear-gradient(#14171a 1px, transparent 1px), linear-gradient(90deg, #14171a 1px, transparent 1px); background-size: 24px 24px; }
+  a { color: inherit; text-decoration: none; }
+  .mono { font-family: "Share Tech Mono", ui-monospace, monospace; }
+  .top { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; margin-bottom: 14px; }
+  .top h1 { margin: 0; font: 700 22px "Saira Condensed", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+  .top h1 span { color: var(--dim); font-weight: 500; }
+  .tape { display: inline-block; background: var(--tape); color: var(--tape-ink); font: 600 12px/1 "Saira Condensed", sans-serif; letter-spacing: .12em; text-transform: uppercase; padding: 4px 8px; border-radius: 2px; box-shadow: 0 1px 0 #000a; }
+  .kv { font-family: "Share Tech Mono", monospace; font-size: 13px; color: var(--dim); }
+  .kv b { color: var(--ink); font-weight: 400; }
+
+  .floor { display: grid; grid-template-columns: minmax(420px, 1.25fr) minmax(300px, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .floor { grid-template-columns: 1fr; } }
+
+  /* the rack */
+  .rack { background: var(--steel); border: 6px solid var(--rail); border-radius: 6px; padding: 8px 8px 8px 34px; position: relative; box-shadow: 0 10px 30px #000a, inset 0 0 0 1px #000; }
+  .rack::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 26px; background: repeating-linear-gradient(#2a3036 0 3px, transparent 3px 44.33px); background-position: 0 6px; border-right: 1px solid #000; }
+  .units { display: grid; gap: 4px; }
+  .unit { background: linear-gradient(180deg, var(--face-2), var(--face)); border: 1px solid #000; border-top-color: var(--edge); border-radius: 3px; position: relative; padding: 8px 10px 8px 12px; display: grid; grid-template-columns: 150px 1fr auto; gap: 8px 12px; align-items: center; min-height: 44px; }
+  .unit.u1 { min-height: 44px; } .unit.u2 { min-height: 92px; } .unit.u3 { min-height: 140px; } .unit.u4 { min-height: 188px; }
+  .unit .screw { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(#6b747d, #2a3036); box-shadow: inset 0 0 0 1px #000; }
+  .unit .screw.tl { left: 3px; top: 5px; } .unit .screw.bl { left: 3px; bottom: 5px; } .unit .screw.tr { right: 3px; top: 5px; } .unit .screw.br { right: 3px; bottom: 5px; }
+  .unit .id { display: grid; gap: 6px; align-content: start; }
+  .unit .id .ip { font: 12px "Share Tech Mono", monospace; color: var(--dim); }
+  .unit .id .role { font-size: 12px; color: var(--dim); line-height: 1.25; }
+  .unit .pwr { display: flex; align-items: center; gap: 6px; font: 11px "Share Tech Mono", monospace; color: var(--dim); }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: var(--off); box-shadow: inset 0 0 0 1px #000; flex: none; }
+  .led.g { background: var(--g); box-shadow: 0 0 5px var(--g), inset 0 0 0 1px #0a3; }
+  .led.a { background: var(--a); box-shadow: 0 0 5px var(--a); }
+  .led.r { background: var(--r); box-shadow: 0 0 6px var(--r); animation: blink 1s steps(2, start) infinite; }
+  .led.b { background: var(--b); box-shadow: 0 0 5px var(--b); }
+  @keyframes blink { to { visibility: hidden; } }
+  @media (prefers-reduced-motion: reduce) { .led.r { animation: none; } }
+
+  .bays { display: flex; flex-wrap: wrap; gap: 4px; }
+  .bay { width: 46px; height: 30px; background: #0d1013; border: 1px solid #000; border-radius: 2px; position: relative; overflow: hidden; }
+  .bay .fill { position: absolute; left: 0; bottom: 0; top: 0; background: #3f4c58; border-right: 1px solid #5a6a78; }
+  .bay.warn .fill { background: #7a5a19; } .bay.crit .fill { background: #8a2320; }
+  .bay .lbl { position: absolute; inset: 0; display: grid; place-items: center; font: 11px "Share Tech Mono", monospace; color: var(--ink); text-shadow: 0 1px 0 #000; }
+  .bay .led { position: absolute; right: 3px; bottom: 3px; width: 5px; height: 5px; }
+  .leds { display: flex; flex-wrap: wrap; gap: 4px 5px; align-content: start; }
+  .leds .ctr { display: flex; align-items: center; gap: 4px; font: 10px "Share Tech Mono", monospace; color: var(--dim); }
+  .leds .ctr.ex { color: var(--r); }
+  .seg { display: grid; gap: 4px; justify-items: end; }
+  .seg .d { background: #0b0d0f; border: 1px solid #000; border-radius: 2px; padding: 2px 8px; font: 18px/1 "Share Tech Mono", monospace; color: var(--g); min-width: 88px; text-align: right; box-shadow: inset 0 0 8px #000; }
+  .seg .d.a { color: var(--a); } .seg .d.r { color: var(--r); } .seg .d.off { color: #2f3a44; }
+  .seg .d small { font-size: 10px; color: var(--dim); margin-right: 6px; }
+  .midrow { display: grid; gap: 6px; }
+  .blank { background: repeating-linear-gradient(90deg, #1b1f23 0 6px, #202529 6px 12px); border: 1px solid #000; border-radius: 3px; height: 22px; }
+
+  /* patch panel */
+  .panel { display: grid; gap: 14px; }
+  .pp { background: linear-gradient(180deg, var(--face-2), var(--face)); border: 1px solid #000; border-top-color: var(--edge); border-radius: 3px; padding: 10px 12px 12px; }
+  .pp h2 { margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; font: 600 13px "Saira Condensed", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .ports { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+  .port { display: grid; grid-template-columns: auto auto 1fr; gap: 6px; align-items: center; background: #0d1013; border: 1px solid #000; border-radius: 2px; padding: 5px 7px; font: 500 13px "Saira Condensed", sans-serif; }
+  .port:hover { background: #151a1f; border-color: var(--edge); }
+  .port .jack { width: 12px; height: 10px; background: #1c2126; border: 1px solid #000; border-radius: 1px 1px 3px 3px; position: relative; }
+  .port > .led { width: 7px; height: 7px; }
+  .port span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .port small { display: block; font: 10px "Share Tech Mono", monospace; color: var(--dim); }
+  .alerts { display: grid; gap: 4px; font: 13px "Share Tech Mono", monospace; }
+  .alerts div { padding: 4px 8px; background: #0d1013; border-left: 3px solid var(--a); }
+  .alerts div.crit { border-left-color: var(--r); }
+  .alerts div.ok { border-left-color: var(--g); color: var(--dim); }
+  :focus-visible { outline: 2px solid var(--b); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Rack <span>· Homebase</span></h1>
+  <span class="tape" id="tape-time">--:--</span>
+  <span class="kv">feed <b id="sweep">—</b></span>
+  <span class="kv">monitors <b id="mon">—</b></span>
+  <span class="kv">players <b id="players">—</b></span>
+  <span class="kv">plex <b id="plex">—</b></span>
+</div>
+
+<div class="floor">
+  <div class="rack" aria-label="Rack elevation"><div class="units" id="units"></div></div>
+  <div class="panel">
+    <div class="pp"><h2>Fault log <span class="kv" id="alertcount"></span></h2><div class="alerts" id="alerts"></div></div>
+    <div id="panels"></div>
+  </div>
+</div>
+
+<script src="/shared/services.js"></script>
+<script src="/shared/data.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LED = { up: 'g', down: 'r', pending: 'a', paused: '', retired: '', none: 'b', maint: 'b' };
+const FN = ['media', 'games', 'ai', 'infra', 'business', 'dev', 'family'];
+setInterval(() => $('#tape-time').textContent = new Date().toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }), 1000);
+
+function seg(label, val, cls = '') { return `<div class="d ${cls}"><small>${label}</small>${val}</div>`; }
+function cls(v, warn, crit, invert) { if (v == null) return 'off'; if (invert) return v < crit ? 'r' : v < warn ? 'a' : ''; return v >= crit ? 'r' : v >= warn ? 'a' : ''; }
+
+function hostUnit(name, u, role, d) {
+  const h = HB.host(name); const ip = HB.hostIp[name];
+  const cont = h?.docker?.containers || [];
+  const worst = h ? HB.worstDisk(h) : null;
+  const games = d.mc.filter(g => g.host === name);
+  return `<div class="unit u${u}"><i class="screw tl"></i><i class="screw bl"></i><i class="screw tr"></i><i class="screw br"></i>
+    <div class="id"><span class="tape">${esc(name)}</span><span class="ip">${esc(ip)}</span><span class="role">${esc(role)}</span>
+      <span class="pwr"><i class="led ${h ? (h.reachable ? 'g' : 'r') : ''}"></i>PWR ${h ? (h.reachable ? 'ON' : 'FAULT') : 'NO DATA'}${h?.uptimeHours != null ? ` · ${h.uptimeHours.toFixed(0)}h` : ''}</span></div>
+    <div class="midrow">
+      ${h?.disks?.length ? `<div class="bays">${h.disks.map(dk => { const used = 100 - dk.freePct; const c = dk.freePct < 10 ? 'crit' : dk.freePct < 20 ? 'warn' : ''; return `<div class="bay ${c}" title="${esc(dk.drive)} ${esc(dk.label)} · ${dk.freeGB.toFixed(0)} GB free of ${dk.sizeGB.toFixed(0)}"><div class="fill" style="width:${used}%"></div><div class="lbl">${esc(dk.drive)}</div><i class="led ${dk.freePct < 10 ? 'r' : dk.freePct < 20 ? 'a' : 'g'}"></i></div>`; }).join('')}</div>` : ''}
+      ${cont.length ? `<div class="leds">${cont.map(c => { const g = games.find(x => x.name === c.name); const l = c.state !== 'running' ? 'r' : (g ? (g.online ? 'g' : 'r') : c.health === 'unhealthy' ? 'a' : 'g'); return `<span class="ctr ${c.state !== 'running' ? 'ex' : ''}" title="${esc(c.status)}"><i class="led ${l}"></i>${esc(c.name.replace(/-server$|-mc$|-1$/, ''))}${g && g.online && g.players ? ` <b style="color:var(--b)">${g.players}</b>` : ''}</span>`; }).join('')}</div>` : (h ? '<div class="blank"></div>' : '<div class="blank"></div><div class="blank"></div>')}
+    </div>
+    <div class="seg">${seg('CPU', h ? h.cpuPct + '%' : '---', cls(h?.cpuPct, 70, 90))}${seg('MEM', h ? h.memUsedPct + '%' : '---', cls(h?.memUsedPct, 80, 90))}${seg(worst ? worst.drive + ' FREE' : 'DISK', worst ? worst.freePct + '%' : '---', cls(worst?.freePct, 20, 10, true))}${seg('CTR', cont.length ? cont.filter(c => c.state === 'running').length + '/' + cont.length : '--', cont.some(c => c.state !== 'running') ? 'a' : '')}</div>
+  </div>`;
+}
+function pveUnit(d) {
+  const p = d.pve;
+  return `<div class="unit u2"><i class="screw tl"></i><i class="screw bl"></i><i class="screw tr"></i><i class="screw br"></i>
+    <div class="id"><span class="tape">pve</span><span class="ip">192.168.1.6</span><span class="role">Proxmox · i7-6700HQ · 16 GB</span><span class="pwr"><i class="led ${p ? 'g' : 'r'}"></i>PWR ${p ? 'ON · ' + p.uptimeDays + 'd' : 'NO DATA'}</span></div>
+    <div class="midrow"><div class="leds">${(p?.guests || []).sort((a, b) => a.vmid - b.vmid).map(g => `<span class="ctr ${g.status !== 'running' ? 'ex' : ''}"><i class="led ${g.status === 'running' ? 'g' : ''}"></i>${g.type === 'lxc' ? 'ct' : 'vm'}${g.vmid} ${esc(g.name)}</span>`).join('')}</div></div>
+    <div class="seg">${seg('CPU', p ? p.cpu + '%' : '---', cls(p?.cpu, 70, 90))}${seg('MEM', p ? p.memPct + '%' : '---', cls(p?.memPct, 80, 90))}${seg('ROOT', p ? p.rootPct + '%' : '---', cls(p?.rootPct, 75, 90))}</div>
+  </div>`;
+}
+function hubUnit(d) {
+  const g = d.kuma.groups.find(x => x.name === 'hub');
+  const hf = HB.host('hub');
+  return `<div class="unit u1"><i class="screw tl"></i><i class="screw bl"></i><i class="screw tr"></i><i class="screw br"></i>
+    <div class="id"><span class="tape">hub</span><span class="ip">192.168.1.141 · LXC 110</span></div>
+    <div class="midrow"><div class="leds">${(g?.monitors || []).map(m => `<span class="ctr"><i class="led ${LED[m.status]}"></i>${esc(m.name.split(' · ')[1])}</span>`).join('')}</div></div>
+    <div class="seg">${seg('PORTS', hf ? hf.ports.filter(p => p.open).length + '/' + hf.ports.length : '--', hf && hf.ports.some(p => !p.open) ? 'a' : '')}</div>
+  </div>`;
+}
+function netUnit(d) {
+  const hosts = (d.feed?.hosts || []);
+  return `<div class="unit u1"><i class="screw tl"></i><i class="screw bl"></i><i class="screw tr"></i><i class="screw br"></i>
+    <div class="id"><span class="tape">UDM Pro</span><span class="ip">192.168.1.1 · gateway</span></div>
+    <div class="midrow"><div class="leds">${hosts.map(h => `<span class="ctr"><i class="led ${h.reachable ? 'g' : 'r'}"></i>${esc(h.name)}</span>`).join('')}<span class="ctr"><i class="led ${LED[HB.status('nginx-vm', 'NPM ingress')] || ''}"></i>NPM 443</span><span class="ctr"><i class="led ${LED[HB.status('udm', 'UniFi (UDM Pro)')] || ''}"></i>UniFi</span></div></div>
+    <div class="seg">${seg('LINKS', hosts.filter(h => h.reachable).length + '/' + hosts.length, hosts.some(h => !h.reachable) ? 'r' : '')}</div>
+  </div>`;
+}
+
+function renderRack(d) {
+  $('#units').innerHTML = netUnit(d) + hostUnit('Server-Rig', 4, 'Game fleet · PhotoPrism · Ryzen 9 5900XT · 128 GB', d) + hostUnit('PlexBoy', 4, 'Plex · Ollama · Authentik · n8n · Ryzen 7 5800X · 128 GB', d) + pveUnit(d) + hubUnit(d) + hostUnit('BlueRig', 2, 'Dev + healthwatch agent · Ryzen 9 9900X · 32 GB', d) + '<div class="blank"></div>';
+}
+function renderPanels(d) {
+  const f = d.feed; const alerts = f?.alerts || [];
+  const monDown = Object.values(d.kuma.byName).filter(m => m.status === 'down');
+  let a = alerts.map(x => `<div class="${x.sev}">${esc(x.host)} · ${esc(x.msg)}</div>`).join('');
+  a += monDown.map(m => `<div>monitor down · ${esc(m.name)}</div>`).join('');
+  a += d.mc.filter(g => !g.online).map(g => `<div class="crit">game offline · ${esc(g.label)} :${g.port}</div>`).join('');
+  $('#alerts').innerHTML = a || '<div class="ok">no faults</div>';
+  $('#alertcount').textContent = `${alerts.length + monDown.length} open · feed ${f ? HB.fmtAgo(f.generatedAt) : 'missing'}`;
+  let html = '';
+  for (const fn of FN) {
+    const items = HB.services.filter(s => s.fn === fn && s.url && s.link !== false && s.status !== 'retired');
+    if (!items.length) continue;
+    const up = items.filter(s => HB.serviceStatus(s) === 'up').length;
+    html += `<div class="pp"><h2>${fn} <span class="kv">${up}/${items.length} lit</span></h2><div class="ports">` + items.map(s => { const st = HB.serviceStatus(s); return `<a class="port" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.note || s.host)}"><i class="led ${LED[st] || ''}"></i><span class="jack"></span><span>${esc(s.label)}<small>${esc(s.host)}${s.status !== 'live' ? ' · ' + s.status : ''}</small></span></a>`; }).join('') + '</div></div>';
+  }
+  const off = HB.services.filter(s => s.status !== 'live');
+  html += `<div class="pp"><h2>unpatched <span class="kv">${off.length}</span></h2><div class="ports">` + off.map(s => `<span class="port" title="${esc(s.note || '')}"><i class="led"></i><span class="jack"></span><span>${esc(s.label)}<small>${s.status}</small></span></span>`).join('') + '</div></div>';
+  $('#panels').innerHTML = html;
+  const all = Object.values(d.kuma.byName); $('#mon').textContent = all.length ? `${all.filter(m => m.status === 'up').length}/${all.length}` : '—';
+  $('#sweep').textContent = f ? HB.fmtAgo(f.generatedAt) + ' · ' + f.overall : 'missing';
+  $('#players').textContent = d.mc.reduce((a, g) => a + g.players, 0) + ' online';
+  $('#plex').textContent = d.plex ? d.plex.streams + ' streaming' : '—';
+}
+async function refresh() {
+  try { const d = await HB.load(); renderRack(d); renderPanels(d); }
+  catch (e) { $('#alerts').innerHTML = `<div class="crit">data link lost · ${esc(e.message)}</div>`; }
+}
+refresh(); setInterval(refresh, 60000);
+</script>
+</body>
+</html>

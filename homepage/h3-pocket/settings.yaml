@@ -1,0 +1,54 @@
+# H3 Pocket — phone-first, 3-second read for the workday away from home.
+# Fleet, alerts and the top links stay open; everything else starts collapsed.
+title: Pocket
+description: Homebase H3 · is anything on fire, then the eight things I open most
+theme: dark
+color: neutral
+headerStyle: underlined
+statusStyle: dot
+hideVersion: true
+target: _blank
+groupsInitiallyCollapsed: true
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+layout:
+  - Fleet:
+        style: row
+        columns: 2
+        initiallyCollapsed: false
+        icon: mdi-heart-pulse
+  - Alerts:
+        style: row
+        columns: 1
+        initiallyCollapsed: false
+        icon: mdi-alert-circle
+  - Top 8:
+        style: row
+        columns: 4
+        initiallyCollapsed: false
+        icon: mdi-star
+  - Games:
+        style: row
+        columns: 4
+        icon: mdi-controller
+  - Media:
+        style: row
+        columns: 3
+        icon: mdi-play-circle
+  - AI:
+        style: row
+        columns: 3
+        icon: mdi-brain
+  - Infra:
+        style: row
+        columns: 3
+        icon: mdi-server
+  - Business & Dev:
+        style: row
+        columns: 3
+        icon: mdi-briefcase
+  - Paused & Retired:
+        style: row
+        columns: 4
+        icon: mdi-pause-circle

@@ -1,0 +1,92 @@
+# Six front-door variants side by side. Phase 1 bake-off only; the winner is
+# promoted to compose/hub on port 80 in phase 2 and the losers are stopped.
+#
+#   3101 h1-console  3102 h2-rack  3103 h3-pocket     (Homepage)
+#   3201 g1-feed     3202 g2-ops   3203 g3-pages      (Glance)
+
+x-homepage: &homepage
+  image: ghcr.io/gethomepage/homepage:latest
+  restart: unless-stopped
+  environment:
+    HOMEPAGE_ALLOWED_HOSTS: "*"
+    NODE_TLS_REJECT_UNAUTHORIZED: "0"   # LAN-only; Proxmox / UDM / Scrypted are self-signed
+    HOMEPAGE_VAR_HUB_IP: ${HUB_IP}
+    HOMEPAGE_VAR_PROXMOX_URL: ${PROXMOX_URL}
+    HOMEPAGE_VAR_PROXMOX_TOKEN_ID: ${PROXMOX_TOKEN_ID}
+    HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET}
+    HOMEPAGE_VAR_PLEX_URL: ${PLEX_URL}
+    HOMEPAGE_VAR_PLEX_TOKEN: ${PLEX_TOKEN}
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+  deploy:
+    resources:
+      limits:
+        memory: 256M
+
+x-glance: &glance
+  image: glanceapp/glance:latest
+  restart: unless-stopped
+  environment:
+    HUB_IP: ${HUB_IP}
+    PROXMOX_URL: ${PROXMOX_URL}
+    PROXMOX_TOKEN_ID: ${PROXMOX_TOKEN_ID}
+    PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET}
+    PLEX_URL: ${PLEX_URL}
+    PLEX_TOKEN: ${PLEX_TOKEN}
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+  deploy:
+    resources:
+      limits:
+        memory: 128M
+
+services:
+  h1-console:
+    <<: *homepage
+    container_name: h1-console
+    ports: ["3101:3000"]
+    volumes:
+      - ../../homepage/h1-console:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  h2-rack:
+    <<: *homepage
+    container_name: h2-rack
+    ports: ["3102:3000"]
+    volumes:
+      - ../../homepage/h2-rack:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  h3-pocket:
+    <<: *homepage
+    container_name: h3-pocket
+    ports: ["3103:3000"]
+    volumes:
+      - ../../homepage/h3-pocket:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  g1-feed:
+    <<: *glance
+    container_name: g1-feed
+    ports: ["3201:8080"]
+    volumes:
+      - ../../glance/g1-feed/glance.yml:/app/config/glance.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  g2-ops:
+    <<: *glance
+    container_name: g2-ops
+    ports: ["3202:8080"]
+    volumes:
+      - ../../glance/g2-ops/glance.yml:/app/config/glance.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  g3-pages:
+    <<: *glance
+    container_name: g3-pages
+    ports: ["3203:8080"]
+    volumes:
+      - ../../glance/g3-pages/glance.yml:/app/config/glance.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro

@@ -1,0 +1,157 @@
+<title>Homebase Custom Three</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F2F5F8; --surface: #FFFFFF; --surface-2: #E7ECF1; --line: #CFD8E1;
+    --ink: #16202B; --muted: #5B6B7C; --accent: #157F8C; --accent-ink: #0E5C66;
+    --up: #2E8B57; --warn: #B7791F; --down: #C0392B; --paused: #7A8794;
+    --shadow: 0 1px 2px rgba(22,32,43,.06), 0 8px 24px rgba(22,32,43,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F151B; --surface: #172029; --surface-2: #1F2A35; --line: #2C3945;
+      --ink: #E6EDF3; --muted: #8CA0B3; --accent: #3FB7C4; --accent-ink: #7FD6E0;
+      --up: #4CC38A; --warn: #E0A63A; --down: #F0655A; --paused: #8CA0B3;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F151B; --surface: #172029; --surface-2: #1F2A35; --line: #2C3945;
+    --ink: #E6EDF3; --muted: #8CA0B3; --accent: #3FB7C4; --accent-ink: #7FD6E0;
+    --up: #4CC38A; --warn: #E0A63A; --down: #F0655A; --paused: #8CA0B3;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--ground); color: var(--ink); font: 16px/1.55 "IBM Plex Sans", system-ui, sans-serif; margin: 0; padding-inline: 20px; padding-block: 32px 64px; }
+  .wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 40px; }
+  h1, h2, h3 { font-family: "Barlow Semi Condensed", "Arial Narrow", sans-serif; text-wrap: balance; margin: 0; line-height: 1.1; }
+  h1 { font-size: 44px; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 28px; font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 24px; font-weight: 600; }
+  p { max-width: 70ch; margin: 0; }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .lede { font-size: 18px; color: var(--muted); }
+  header { display: grid; gap: 12px; }
+  section { display: grid; gap: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  td.num, th.num { text-align: center; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  .best { color: var(--accent-ink); font-weight: 600; }
+  .pill { display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+  .variant { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); padding: 22px; display: grid; gap: 16px; }
+  .variant .head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; }
+  .variant .head .port { font-family: "IBM Plex Mono", monospace; color: var(--muted); font-size: 14px; }
+  .thesis { font-size: 17px; max-width: 75ch; }
+  .shots { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 14px; }
+  @media (max-width: 760px) { .shots { grid-template-columns: 1fr; } }
+  .shot { border: 1px solid var(--line); background: var(--surface-2); max-height: 620px; overflow: auto; }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot-label { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .pc { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .pc div { display: grid; gap: 6px; align-content: start; }
+  .pc .k { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+  .pc .sig .k { color: var(--accent-ink); } .pc .pro .k { color: var(--up); } .pc .con .k { color: var(--warn); } .pc .type .k { color: var(--muted); }
+  ul { margin: 0; padding-left: 18px; } li { margin: 2px 0; }
+  .note { border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--surface); max-width: 80ch; }
+  code { font-family: "IBM Plex Mono", monospace; font-size: 14px; background: var(--surface-2); padding: 1px 5px; }
+  a { color: var(--accent-ink); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">homebase · from-scratch variants · built 2026-09-15 · hub 192.168.1.141</div>
+    <h1>Homebase Custom Three</h1>
+    <p class="lede">Three front doors written from a blank file, each borrowing its whole visual language from something in your world instead of from a dashboard product. Flight Deck was replaced by JARVIS on request. All three are live on hub right now, reading the same feed, Uptime Kuma, Proxmox and Plex as the stock variants, plus a new sidecar that does a real Minecraft and Bedrock handshake for player counts. Every screenshot is the real page.</p>
+  </header>
+
+  <section>
+    <h2>What they share under the hood</h2>
+    <p>One nginx serves all three and proxies every data source on the same origin, so the pages hold no secrets and need no CORS. A Python sidecar answers <code>/mc/java</code> and <code>/mc/bedrock</code> with a genuine status handshake, which is the check that would have caught the All the Mons zombie in September. The service list is generated from the same inventory file as every other variant, and the checker passes for all nine.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Path on the page</th><th>Source</th><th>What it gives the page</th></tr></thead>
+        <tbody>
+          <tr><td><code>/feed/latest.json</code></td><td>healthwatch snapshot on hub</td><td>Per-host CPU, memory, every disk, every container with health and restarts, alerts</td></tr>
+          <tr><td><code>/kuma/api/status-page/…</code></td><td>Uptime Kuma</td><td>58 monitors with current beat and 24 h uptime</td></tr>
+          <tr><td><code>/pve/api2/json/…</code></td><td>Proxmox, read-only token injected by nginx</td><td>Node CPU, memory, root disk, uptime, every VM and LXC with state</td></tr>
+          <tr><td><code>/plex/status/sessions</code></td><td>Plex, token injected by nginx</td><td>Who is watching what</td></tr>
+          <tr><td><code>/mc/java</code> · <code>/mc/bedrock</code></td><td>mcstatus sidecar</td><td>Online, players, max, version, latency per game server</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The three</h2>
+
+    <article class="variant">
+      <div class="head"><h3>JARVIS</h3><span class="port">:3301</span><span class="pill">arc reactor · briefing · holographic tiles</span></div>
+      <p class="thesis">Stark's assistant, but every element is data. JARVIS opens by telling you the state in a sentence: "Good evening, sir. All 6 machines are responding. 54 of 58 monitors are green; BlueRig (ping) and File Browser are not. bettermc-mc reports unhealthy on Server-Rig. PlexBoy's C: 8% free, I would address that soon." The arc reactor in the middle is the fleet: the core reads OK / WARN / CRIT, the inner ring is the four hosts as arc segments (CPU on the outer track, memory on the inner), the middle ring is one tick per Uptime Kuma monitor, and the outer ring is the ten game servers as nodes that grow and turn gold when someone is on. The rings rotate slowly; the core breathes. Every tool is a holographic tile with a status rail.</p>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:c1-jarvis-desktop}}" alt="JARVIS desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:c1-jarvis-mobile}}" alt="JARVIS phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="type"><span class="k">Type · palette</span><ul><li>Orbitron for the brand and labels, Exo 2 for the briefing, Share Tech Mono for readouts</li><li>HUD cyan on black glass, gold for anything that wants attention, red only for down</li></ul></div>
+        <div class="sig"><span class="k">Signature</span><ul><li>The briefing: the page speaks first, in prose, and the numbers back it up</li><li>The reactor: five rings, all of them real data, nothing decorative except the outer tick ring</li></ul></div>
+        <div class="pro"><span class="k">Where it wins</span><ul><li>The fastest human read of all nine: you read one sentence and you know</li><li>The most fun to leave on a wall screen</li></ul></div>
+        <div class="con"><span class="k">Where it loses</span><ul><li>The reactor is a picture, not a menu; links are in the tiles below the fold on a laptop</li><li>Motion. It is subtle and it honors reduced-motion, but some people will want it off</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>Rack Elevation</h3><span class="port">:3302</span><span class="pill">drive bays · LED per container · patch panel</span></div>
+      <p class="thesis">The lab as a literal rack. Each machine is a unit face with a Dymo label, a bank of drive bays that fill as the disk fills and go amber under 20% and red under 10%, one LED per container with players shown in blue where anyone is on, and seven-segment readouts for CPU, memory, worst disk and container count. pve shows its VMs and LXCs as LEDs from the Proxmox API; the UDM unit at the top lights one link per host the feed can reach. The right side is a patch panel: every tool is an RJ45 port, lit when up, grouped by what it is for. The fault log at the top is the only text that is not a label.</p>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:c2-rack-desktop}}" alt="Rack Elevation desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:c2-rack-mobile}}" alt="Rack Elevation phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="type"><span class="k">Type · palette</span><ul><li>Saira Condensed for labels, Share Tech Mono for readouts, cream label tape on matte steel</li><li>Green / amber / red / blue LEDs; nothing else is colored</li></ul></div>
+        <div class="sig"><span class="k">Signature</span><ul><li>Drive bays that fill. PlexBoy's C: bay is red at 8% and you see it before you read anything</li><li>An exited container is a dead LED with a red name, exactly like walking past a real rack</li></ul></div>
+        <div class="pro"><span class="k">Where it wins</span><ul><li>Densest useful information of the nine: 31 Server-Rig containers, 8 drives, 6 hosts, all on one face</li><li>The patch panel is the best link wall of the three customs</li></ul></div>
+        <div class="con"><span class="k">Where it loses</span><ul><li>Skeuomorphism has a shelf life; it will look dated before the others</li><li>Per-container LEDs are 10 px text, fine on a monitor, a squint on a phone</li></ul></div>
+      </div>
+    </article>
+
+    <article class="variant">
+      <div class="head"><h3>Transit Map</h3><span class="port">:3303</span><span class="pill">one line per machine · stations are tools · departure board</span></div>
+      <p class="thesis">A transit map is a link wall that also shows topology, and everybody already knows how to read one. Each machine is a colored line; each service is a station you click; a service on two machines is an interchange (Ollama, dashed between the Server-Rig and PlexBoy lines). Vertical zones group stations by what they are for, so Games is one stretch of the red line and Infra is where the green pve line gets busy. A station that is down is a red disc with a cross, the way a closed station is marked. The departure board on top lists delays instead of alerts and shows good service when there are none. Light and dark themes both.</p>
+      <div class="shots">
+        <div><div class="shot-label">1440 × 900</div><div class="shot"><img src="{{IMG:c3-transit-desktop}}" alt="Transit Map desktop"></div></div>
+        <div><div class="shot-label">390 × 844</div><div class="shot"><img src="{{IMG:c3-transit-mobile}}" alt="Transit Map phone"></div></div>
+      </div>
+      <div class="pc">
+        <div class="type"><span class="k">Type · palette</span><ul><li>Overpass, derived from Highway Gothic signage, with Barlow Condensed for the board</li><li>Line colors follow real transit conventions: red, blue, green, purple, and a dashed grey line for the cloud</li></ul></div>
+        <div class="sig"><span class="k">Signature</span><ul><li>The map itself, drawn from the inventory at load, so adding a service adds a station</li><li>The departure board: DELAY in red, GOOD SERVICE in green, in the font of an airport flap board</li></ul></div>
+        <div class="pro"><span class="k">Where it wins</span><ul><li>Most legible link wall of all nine; you can hand it to the family</li><li>Topology and status in one picture; the only one that shows "this runs in two places"</li></ul></div>
+        <div class="con"><span class="k">Where it loses</span><ul><li>Least numeric: no gauges, host stats are in cards below the fold</li><li>Station labels get tight in the Games zone; at 900 px wide the map scrolls sideways</li></ul></div>
+      </div>
+    </article>
+  </section>
+
+  <section>
+    <h2>Against the stock six</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th class="num">JARVIS</th><th class="num">Rack</th><th class="num">Transit</th><th class="num">best stock</th></tr></thead>
+        <tbody>
+          <tr><td>Is anything on fire?</td><td class="num best">5</td><td class="num">4</td><td class="num">4</td><td class="num">5 · H3</td></tr>
+          <tr><td>Density at a desk</td><td class="num">4</td><td class="num best">5</td><td class="num">3</td><td class="num">5 · G2</td></tr>
+          <tr><td>Phone</td><td class="num">4</td><td class="num">3</td><td class="num">3</td><td class="num">5 · H3</td></tr>
+          <tr><td>Link wall</td><td class="num">3</td><td class="num">4</td><td class="num best">5</td><td class="num">4 · H2</td></tr>
+          <tr><td>Live data depth</td><td class="num">4</td><td class="num best">5</td><td class="num">3</td><td class="num">5 · G2</td></tr>
+          <tr><td>Effort to add a service</td><td class="num best">5</td><td class="num best">5</td><td class="num best">5</td><td class="num">3 · H</td></tr>
+          <tr><td>Effort to add a new widget</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">5 · Homepage</td></tr>
+          <tr><td>Something nobody else has</td><td class="num best">5</td><td class="num best">5</td><td class="num best">5</td><td class="num">2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p><b>Honest trade.</b> The customs cost nothing to add a service to (edit the inventory, done) and everything to add a new kind of widget to (you write it). Homepage is the reverse. The customs also have zero upstream: no updates, no CVEs, no breaking config changes, and no one else's roadmap. If one of these is the answer, the practical shape is <b>JARVIS as the wall and phone page, Rack as the desk page</b>, sharing the same data layer, with Transit kept for the family. If you'd rather not own frontend code, H2 plus H3 remains the right stock answer.</p>
+    </div>
+  </section>
+</div>

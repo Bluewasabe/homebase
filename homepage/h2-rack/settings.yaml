@@ -1,0 +1,50 @@
+# H2 Rack — grouped by what things are for, not where they run.
+title: Rack
+description: Homebase H2 · media, games, AI, infra, business, dev
+theme: dark
+color: slate
+headerStyle: boxed
+statusStyle: dot
+hideVersion: true
+target: _blank
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+layout:
+  - Status:
+        style: row
+        columns: 3
+        icon: mdi-pulse
+  - Media:
+        style: row
+        columns: 3
+        icon: mdi-play-circle
+  - Games:
+        style: row
+        columns: 4
+        icon: mdi-controller
+  - AI:
+        style: row
+        columns: 3
+        icon: mdi-brain
+  - Infra:
+        style: row
+        columns: 4
+        icon: mdi-server
+  - Business:
+        style: row
+        columns: 3
+        icon: mdi-briefcase
+  - Dev:
+        style: row
+        columns: 3
+        icon: mdi-code-braces
+  - Family:
+        style: row
+        columns: 3
+        icon: mdi-home-heart
+  - Paused & Retired:
+        style: row
+        columns: 4
+        initiallyCollapsed: true
+        icon: mdi-pause-circle

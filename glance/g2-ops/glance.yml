@@ -1,0 +1,209 @@
+# G2 Ops — Glance pushed as far toward a console as it goes. Every panel is
+# live data: healthwatch feed, Uptime Kuma heartbeats, Proxmox API, Plex API,
+# hub server stats, hub Docker. Tests whether Glance can match Homepage on ops.
+server:
+  port: 8080
+
+theme:
+  background-color: 200 20 6
+  primary-color: 150 60 55
+  positive-color: 150 60 55
+  negative-color: 0 75 60
+  contrast-multiplier: 1.15
+  text-saturation-multiplier: 0.9
+
+pages:
+  - name: Ops
+    width: wide
+    columns:
+      - size: full
+        widgets:
+          - type: custom-api
+            title: Fleet · healthwatch
+            title-url: http://${HUB_IP}:3009/latest.json
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ $o := .JSON.String "overall" }}
+              <div class="flex justify-between text-center margin-bottom-10">
+                <div><div class="size-h1 {{ if eq $o "OK" }}color-positive{{ else if eq $o "CRIT" }}color-negative{{ else }}color-primary{{ end }}">{{ $o }}</div><div class="size-h6">FLEET</div></div>
+                <div><div class="size-h1 color-highlight">{{ .JSON.Int "warnCount" }}</div><div class="size-h6">WARN</div></div>
+                <div><div class="size-h1 color-highlight">{{ .JSON.Int "critCount" }}</div><div class="size-h6">CRIT</div></div>
+                <div><div class="size-h1 color-highlight">{{ len (.JSON.Array "hosts") }}</div><div class="size-h6">HOSTS</div></div>
+                <div><div class="size-h5 color-subdue" style="padding-top:10px">{{ .JSON.String "generatedAtLocal" }}</div><div class="size-h6">SWEEP</div></div>
+              </div>
+              <table style="width:100%;border-collapse:collapse" class="size-h5">
+                <tr class="color-subdue size-h6"><th style="text-align:left">host</th><th>up</th><th>cpu</th><th>mem</th><th>ctr</th><th style="text-align:left">disks (% free)</th></tr>
+                {{ range .JSON.Array "hosts" }}
+                <tr style="border-top:1px solid var(--color-separator)">
+                  <td class="color-highlight" style="padding:4px 0">{{ .String "name" }}<div class="size-h6 color-subdue">{{ .String "ip" }}</div></td>
+                  <td style="text-align:center">{{ if .Bool "reachable" }}<span class="color-positive">●</span>{{ else }}<span class="color-negative">●</span>{{ end }}</td>
+                  {{ if gt (.Int "memTotalGB") 0 }}
+                  <td style="text-align:center">{{ .Int "cpuPct" }}%</td>
+                  <td style="text-align:center"{{ if ge (.Int "memUsedPct") 90 }} class="color-negative"{{ end }}>{{ .Int "memUsedPct" }}%</td>
+                  <td style="text-align:center">{{ len (.Array "docker.containers") }}</td>
+                  <td><ul class="list-horizontal-text">{{ range .Array "disks" }}{{ $f := .Int "freePct" }}<li{{ if lt $f 10 }} class="color-negative"{{ else if lt $f 20 }} class="color-primary"{{ end }}>{{ .String "drive" }} {{ $f }}</li>{{ end }}</ul></td>
+                  {{ else }}
+                  <td colspan="4" class="color-subdue">ports only</td>
+                  {{ end }}
+                </tr>
+                {{ end }}
+              </table>
+              {{ $alerts := .JSON.Array "alerts" }}
+              {{ if $alerts }}
+              <ul class="list list-gap-6 margin-top-15">
+              {{ range $alerts }}
+                <li class="size-h5"><span class="{{ if eq (.String "sev") "crit" }}color-negative{{ else }}color-primary{{ end }}">{{ .String "sev" }}</span> <span class="color-highlight">{{ .String "host" }}</span> <span class="color-paragraph">{{ .String "msg" }}</span></li>
+              {{ end }}
+              </ul>
+              {{ end }}
+
+          - type: custom-api
+            title: Uptime Kuma · every monitor
+            title-url: http://${HUB_IP}:3001/status/homelab
+            cache: 1m
+            url: http://${HUB_IP}:3001/api/status-page/homelab
+            subrequests:
+              hb:
+                url: http://${HUB_IP}:3001/api/status-page/heartbeat/homelab
+            template: |
+              {{ $hb := .Subrequest "hb" }}
+              {{ range .JSON.Array "publicGroupList" }}
+                <div class="size-h5 color-highlight margin-top-10">{{ .String "name" }}</div>
+                <ul class="list-horizontal-text">
+                {{ range .Array "monitorList" }}
+                  {{ $id := .Int "id" }}
+                  {{ $st := -1 }}
+                  {{ range $hb.JSON.Array (printf "heartbeatList.%d" $id) }}{{ $st = .Int "status" }}{{ end }}
+                  <li class="{{ if eq $st 1 }}color-positive{{ else if eq $st 0 }}color-negative{{ else if eq $st 2 }}color-primary{{ else }}color-subdue{{ end }}">{{ if eq $st 1 }}●{{ else if eq $st 0 }}✖{{ else }}○{{ end }} {{ .String "name" }}</li>
+                {{ end }}
+                </ul>
+              {{ end }}
+
+          - type: custom-api
+            title: Containers · Server-Rig
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ range .JSON.Array "hosts" }}{{ if eq (.String "name") "Server-Rig" }}
+              <ul class="list-horizontal-text">
+              {{ range .Array "docker.containers" }}
+                {{ $h := .String "health" }}{{ $s := .String "state" }}
+                <li class="{{ if ne $s "running" }}color-negative{{ else if eq $h "unhealthy" }}color-primary{{ else }}color-positive{{ end }}">{{ .String "name" }}{{ if gt (.Int "restarts") 0 }} <span class="color-subdue">↻{{ .Int "restarts" }}</span>{{ end }}</li>
+              {{ end }}
+              </ul>
+              {{ end }}{{ end }}
+
+          - type: custom-api
+            title: Containers · PlexBoy
+            cache: 1m
+            url: http://${HUB_IP}:3009/latest.json
+            template: |
+              {{ range .JSON.Array "hosts" }}{{ if eq (.String "name") "PlexBoy" }}
+              <ul class="list-horizontal-text">
+              {{ range .Array "docker.containers" }}
+                {{ $h := .String "health" }}{{ $s := .String "state" }}
+                <li class="{{ if ne $s "running" }}color-negative{{ else if eq $h "unhealthy" }}color-primary{{ else }}color-positive{{ end }}">{{ .String "name" }}{{ if gt (.Int "restarts") 0 }} <span class="color-subdue">↻{{ .Int "restarts" }}</span>{{ end }}</li>
+              {{ end }}
+              </ul>
+              {{ end }}{{ end }}
+
+      - size: small
+        widgets:
+          - type: server-stats
+            servers:
+              - type: local
+                name: hub
+
+          - type: custom-api
+            title: Proxmox · pve
+            title-url: https://192.168.1.6:8006
+            cache: 1m
+            url: ${PROXMOX_URL}/api2/json/nodes/pve/status
+            allow-insecure: true
+            headers:
+              Authorization: PVEAPIToken=${PROXMOX_TOKEN_ID}=${PROXMOX_TOKEN_SECRET}
+            template: |
+              {{ $d := .JSON.Get "data" }}
+              {{ $cpu := mul ($d.Float "cpu") 100 | toInt }}
+              {{ $memPct := div (mul ($d.Float "memory.used") 100) ($d.Float "memory.total") | toInt }}
+              {{ $rootPct := div (mul ($d.Float "rootfs.used") 100) ($d.Float "rootfs.total") | toInt }}
+              <div class="flex justify-between text-center">
+                <div><div class="size-h3 color-highlight">{{ $cpu }}%</div><div class="size-h6">CPU</div></div>
+                <div><div class="size-h3 {{ if ge $memPct 90 }}color-negative{{ else }}color-highlight{{ end }}">{{ $memPct }}%</div><div class="size-h6">MEM</div></div>
+                <div><div class="size-h3 color-highlight">{{ $rootPct }}%</div><div class="size-h6">ROOT</div></div>
+                <div><div class="size-h3 color-highlight">{{ div ($d.Int "uptime") 86400 }}d</div><div class="size-h6">UP</div></div>
+              </div>
+
+          - type: custom-api
+            title: Plex · now playing
+            title-url: http://192.168.1.217:32400/web
+            cache: 30s
+            url: ${PLEX_URL}/status/sessions
+            headers:
+              Accept: application/json
+              X-Plex-Token: ${PLEX_TOKEN}
+            template: |
+              {{ $n := .JSON.Int "MediaContainer.size" }}
+              <div class="size-h3 {{ if gt $n 0 }}color-positive{{ else }}color-subdue{{ end }}">{{ $n }} stream{{ if ne $n 1 }}s{{ end }}</div>
+              <ul class="list list-gap-6 margin-top-10">
+              {{ range .JSON.Array "MediaContainer.Metadata" }}
+                <li class="size-h5"><span class="color-highlight">{{ .String "User.title" }}</span> · {{ .String "grandparentTitle" }} {{ .String "title" }} <span class="color-subdue">({{ .String "Player.state" }})</span></li>
+              {{ end }}
+              </ul>
+
+          - type: monitor
+            title: Ingress & auth
+            cache: 1m
+            style: compact
+            sites:
+              - { title: Nginx Proxy Manager, url: "http://192.168.1.106:40081", icon: di:nginx-proxy-manager }
+              - { title: UniFi, url: "https://192.168.1.1", allow-insecure: true, icon: di:unifi }
+              - { title: Authentik, url: "http://192.168.1.217:9000", check-url: "http://192.168.1.217:9000/-/health/live/", icon: di:authentik }
+              - { title: Vaultwarden, url: "http://192.168.1.217:8222", icon: di:vaultwarden }
+              - { title: FIBI, url: "https://alwaysbookit.com", check-url: "http://192.168.4.93:5050/", icon: mdi:airplane }
+              - { title: Plausible, url: "http://192.168.1.224:8000", icon: di:plausible }
+              - { title: Uptime Kuma, url: "http://192.168.1.141:3001", icon: di:uptime-kuma }
+
+          - type: monitor
+            title: Apps
+            cache: 1m
+            style: compact
+            sites:
+              - { title: Plex, url: "http://192.168.1.217:32400/web", check-url: "http://192.168.1.217:32400/identity", icon: di:plex }
+              - { title: PhotoPrism, url: "http://192.168.1.5:2342", icon: di:photoprism }
+              - { title: Media Manager, url: "http://192.168.1.217:45681", icon: mdi:movie-open }
+              - { title: File Browser, url: "http://192.168.1.5:8085", icon: di:filebrowser }
+              - { title: Open WebUI, url: "http://192.168.1.217:3000", icon: di:open-webui }
+              - { title: Ollama (PlexBoy), url: "http://192.168.1.217:11434", icon: di:ollama }
+              - { title: Ollama (Server-Rig), url: "http://192.168.1.5:11434", icon: di:ollama }
+              - { title: n8n, url: "http://192.168.1.217:5678", icon: di:n8n }
+              - { title: Obsidian Sync, url: "http://192.168.1.217:5984/_utils", check-url: "http://192.168.1.217:5984/_up", alt-status-codes: [401], icon: di:couchdb }
+              - { title: Mission Control, url: "http://192.168.1.217:45680", icon: mdi:rocket-launch }
+              - { title: Scrypted, url: "https://192.168.1.61:10443", allow-insecure: true, icon: mdi:cctv }
+
+          - type: monitor
+            title: Old stack (retiring)
+            cache: 1m
+            style: compact
+            sites:
+              - { title: Grafana (old), url: "http://192.168.1.5:3000", icon: di:grafana }
+              - { title: Prometheus (old), url: "http://192.168.1.5:9090", icon: di:prometheus }
+              - { title: cAdvisor (old), url: "http://192.168.1.5:8080", icon: mdi:chart-box-outline }
+              - { title: Homepage (old), url: "http://192.168.1.5:3005", icon: mdi:view-dashboard }
+              - { title: Homarr (old), url: "http://192.168.1.5:7575", icon: mdi:view-dashboard-outline }
+
+          - type: bookmarks
+            groups:
+              - title: Cloud
+                links:
+                  - { title: Proxmox, url: "https://192.168.1.6:8006", icon: di:proxmox }
+                  - { title: GitHub, url: "https://github.com/Bluewasabe", icon: si:github }
+                  - { title: Cloudflare, url: "https://dash.cloudflare.com", icon: di:cloudflare }
+                  - { title: Notion, url: "https://www.notion.so", icon: di:notion }
+                  - { title: Plex (remote), url: "https://app.plex.tv", icon: di:plex }
+                  - { title: Plausible (public), url: "https://analytics.alwaysbookit.com", icon: di:plausible }
+
+          - type: docker-containers
+            title: hub containers
+            hide-by-default: false

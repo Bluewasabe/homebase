@@ -1,0 +1,15 @@
+- resources:
+    label: hub
+    cpu: true
+    memory: true
+    disk: /
+    uptime: true
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: short
+      timeStyle: short
+      hour12: true
+- search:
+    provider: duckduckgo
+    target: _blank

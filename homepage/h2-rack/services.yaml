@@ -1,0 +1,261 @@
+# H2 Rack — grouped by function. Uptime Kuma is the headline.
+
+- Status:
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: http://192.168.1.141:3001
+        description: status page /status/homelab
+        server: hub
+        container: uptime-kuma
+        widget:
+          type: uptimekuma
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3001
+          slug: homelab
+    - Fleet (healthwatch):
+        icon: mdi-heart-pulse
+        href: http://192.168.1.141:3009/latest.json
+        description: sweep every 5 min from BlueRig
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          mappings:
+            - field: overall
+              label: Overall
+            - field: warnCount
+              label: Warn
+              format: number
+            - field: critCount
+              label: Crit
+              format: number
+            - field: generatedAt
+              label: Sweep
+              format: relativeDate
+              style: short
+    - Alerts:
+        icon: mdi-alert-circle
+        widget:
+          type: customapi
+          url: http://{{HOMEPAGE_VAR_HUB_IP}}:3009/latest.json
+          refreshInterval: 60000
+          display: dynamic-list
+          mappings:
+            items: alerts
+            name: host
+            label: msg
+            limit: 6
+
+- Media:
+    - Plex:
+        icon: plex.png
+        href: http://192.168.1.217:32400/web
+        description: PlexBoy · native
+        siteMonitor: http://192.168.1.217:32400/identity
+        widget:
+          type: plex
+          url: {{HOMEPAGE_VAR_PLEX_URL}}
+          key: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+    - PhotoPrism:
+        icon: photoprism.png
+        href: http://192.168.1.5:2342
+        description: Server-Rig
+        siteMonitor: http://192.168.1.5:2342
+    - Media Manager:
+        icon: mdi-movie-open
+        href: http://192.168.1.217:45681
+        description: PlexBoy
+        siteMonitor: http://192.168.1.217:45681
+    - File Browser:
+        icon: filebrowser.png
+        href: http://192.168.1.5:8085
+        description: Server-Rig
+        siteMonitor: http://192.168.1.5:8085
+    - Plex (remote):
+        icon: plex.png
+        href: https://app.plex.tv
+        description: app.plex.tv
+
+- Games:
+    - Vanilla:
+        icon: minecraft.png
+        description: 192.168.1.5:25565
+        widget: { type: minecraft, url: udp://192.168.1.5:25565 }
+    - ATM 11:
+        icon: minecraft.png
+        description: 192.168.1.5:25566
+        widget: { type: minecraft, url: udp://192.168.1.5:25566 }
+    - All the Mons:
+        icon: minecraft.png
+        description: 192.168.1.5:25567
+        widget: { type: minecraft, url: udp://192.168.1.5:25567 }
+    - ATM 10:
+        icon: minecraft.png
+        description: 192.168.1.5:25568
+        widget: { type: minecraft, url: udp://192.168.1.5:25568 }
+    - Dragons:
+        icon: minecraft.png
+        description: 192.168.1.5:25571
+        widget: { type: minecraft, url: udp://192.168.1.5:25571 }
+    - Cobblemon:
+        icon: minecraft.png
+        description: 192.168.1.5:25572
+        widget: { type: minecraft, url: udp://192.168.1.5:25572 }
+    - Create:
+        icon: minecraft.png
+        description: 192.168.1.5:25574
+        widget: { type: minecraft, url: udp://192.168.1.5:25574 }
+    - Bedrock Survival:
+        icon: minecraft.png
+        description: udp 19132
+    - Bedrock Creative:
+        icon: minecraft.png
+        description: udp 19134
+    - Palworld 1:
+        icon: palworld.png
+        description: udp 8211
+    - Palworld 3:
+        icon: palworld.png
+        description: udp 8219
+
+- AI:
+    - Open WebUI:
+        icon: open-webui.png
+        href: http://192.168.1.217:3000
+        description: chat front end
+        siteMonitor: http://192.168.1.217:3000
+    - Ollama (PlexBoy):
+        icon: ollama.png
+        href: http://192.168.1.217:11434
+        description: RTX 5060 · interactive node
+        siteMonitor: http://192.168.1.217:11434
+    - Ollama (Server-Rig):
+        icon: ollama.png
+        href: http://192.168.1.5:11434
+        description: x1 riser · slow
+        siteMonitor: http://192.168.1.5:11434
+    - SearXNG:
+        icon: searxng.png
+        description: PlexBoy localhost only
+    - Excalidraw:
+        icon: excalidraw.png
+        description: PlexBoy localhost only
+
+- Infra:
+    - Proxmox:
+        icon: proxmox.png
+        href: https://192.168.1.6:8006
+        siteMonitor: https://192.168.1.6:8006
+        widget:
+          type: proxmox
+          url: {{HOMEPAGE_VAR_PROXMOX_URL}}
+          username: {{HOMEPAGE_VAR_PROXMOX_TOKEN_ID}}
+          password: {{HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET}}
+          node: pve
+    - Nginx Proxy Manager:
+        icon: nginx-proxy-manager.png
+        href: http://192.168.1.106:40081
+        siteMonitor: http://192.168.1.106:40081
+    - UniFi (UDM Pro):
+        icon: unifi.png
+        href: https://192.168.1.1
+        siteMonitor: https://192.168.1.1
+    - Authentik:
+        icon: authentik.png
+        href: http://192.168.1.217:9000
+        siteMonitor: http://192.168.1.217:9000/-/health/live/
+    - Vaultwarden:
+        icon: vaultwarden.png
+        href: http://192.168.1.217:8222
+        siteMonitor: http://192.168.1.217:8222
+    - Cloudflare DNS:
+        icon: cloudflare.png
+        href: https://dash.cloudflare.com
+    - Prometheus (old):
+        icon: prometheus.png
+        href: http://192.168.1.5:9090
+        description: retire in phase 3
+        siteMonitor: http://192.168.1.5:9090
+        widget:
+          type: prometheus
+          url: http://192.168.1.5:9090
+    - Grafana (old):
+        icon: grafana.png
+        href: http://192.168.1.5:3000
+        description: retire in phase 3
+        siteMonitor: http://192.168.1.5:3000
+    - cAdvisor (old):
+        icon: cadvisor.png
+        href: http://192.168.1.5:8080
+        description: retire in phase 3
+        siteMonitor: http://192.168.1.5:8080
+    - Homepage (old):
+        icon: homepage.png
+        href: http://192.168.1.5:3005
+        description: retire in phase 2
+        siteMonitor: http://192.168.1.5:3005
+    - Homarr (old):
+        icon: homarr.png
+        href: http://192.168.1.5:7575
+        description: retire in phase 2
+        siteMonitor: http://192.168.1.5:7575
+
+- Business:
+    - FIBI:
+        icon: mdi-airplane
+        href: https://alwaysbookit.com
+        description: alwaysbookit.com · LXC 100
+        siteMonitor: http://192.168.4.93:5050/
+    - Plausible:
+        icon: plausible.png
+        href: http://192.168.1.224:8000
+        description: LXC 101
+        siteMonitor: http://192.168.1.224:8000
+    - Plausible (public):
+        icon: plausible.png
+        href: https://analytics.alwaysbookit.com
+    - n8n:
+        icon: n8n.png
+        href: http://192.168.1.217:5678
+        description: automation
+        siteMonitor: http://192.168.1.217:5678
+    - Notion:
+        icon: notion.png
+        href: https://www.notion.so
+
+- Dev:
+    - GitHub:
+        icon: github.png
+        href: https://github.com/Bluewasabe
+    - Obsidian Sync:
+        icon: couchdb.png
+        href: http://192.168.1.217:5984/_utils
+        siteMonitor: http://192.168.1.217:5984/_up
+    - Mission Control:
+        icon: mdi-rocket-launch
+        href: http://192.168.1.217:45680
+        description: OpenClaw-era, dormant
+        siteMonitor: http://192.168.1.217:45680
+
+- Family:
+    - Scrypted:
+        icon: scrypted.png
+        href: https://192.168.1.61:10443
+        description: cameras
+        siteMonitor: https://192.168.1.61:10443
+
+- Paused & Retired:
+    - Better MC 4:
+        icon: minecraft.png
+        description: paused 2026-10-14 · healthcheck
+    - Hytale:
+        icon: mdi-gamepad-variant
+        description: paused · exit 143
+    - TubeIntel:
+        icon: mdi-youtube
+        description: paused · exit 137
+    - Palworld 2:
+        icon: palworld.png
+        description: retired 2026-09-15
+    - OpenClaw:
+        icon: mdi-robot
+        description: retired · preserved for revival

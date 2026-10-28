@@ -1,0 +1,19 @@
+- logo:
+    icon: mdi-home-circle
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: medium
+      timeStyle: short
+      hour12: true
+- openmeteo:
+    label: Home
+    latitude: 39.95
+    longitude: -75.17
+    timezone: America/New_York
+    units: imperial
+    cache: 10
+- resources:
+    label: hub
+    cpu: true
+    memory: true
