@@ -18,10 +18,10 @@
 - {name: atm10-mc,         label: ATM 10,         host: Server-Rig, kind: game-mc,  port: 25568, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraft}
 - {name: dragons-mc,       label: Dragons,        host: Server-Rig, kind: game-mc,  port: 25571, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraft}
 - {name: cobblemon-mc,     label: Cobblemon,      host: Server-Rig, kind: game-mc,  port: 25572, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraft}
-- {name: bettermc-mc,      label: Better MC 4,    host: Server-Rig, kind: game-mc,  port: 25573, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraft, note: "Reports unhealthy 2026-09-15"}
+- {name: bettermc-mc,      label: Better MC 4,    host: Server-Rig, kind: game-mc,  port: 25573, status: paused, fn: games, icon: minecraft.png, kuma: gamedig:minecraft, note: "Parked 2026-10-14 by Chris: Docker healthcheck stuck unhealthy since 2026-09-15 while the server itself was fine. restart=no + compose profiles:[disabled]. See healthwatch/DOWNTIME.md"}
 - {name: create-mc,        label: Create,         host: Server-Rig, kind: game-mc,  port: 25574, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraft}
-- {name: bedrock-survival, label: Bedrock Survival, host: Server-Rig, kind: game-udp, port: 19132, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraftbe}
-- {name: bedrock-creative, label: Bedrock Creative, host: Server-Rig, kind: game-udp, port: 19134, status: live, fn: games, icon: minecraft.png, kuma: gamedig:minecraftbe}
+- {name: bedrock-survival, label: Bedrock Survival, host: Server-Rig, kind: game-udp, port: 19132, status: live, fn: games, icon: minecraft.png, kuma: port, note: "NetherNet since 2026-10-10: TCP signaling on 19132, UDP 19140-19149"}
+- {name: bedrock-creative, label: Bedrock Creative, host: Server-Rig, kind: game-udp, port: 19134, status: live, fn: games, icon: minecraft.png, kuma: port, note: "NetherNet since 2026-10-10: TCP signaling on 19134, UDP 19150-19159"}
 - {name: palworld-server,  label: Palworld 1,     host: Server-Rig, kind: game-udp, port: 8211,  status: live, fn: games, icon: palworld.png, kuma: steam, query: 27015, monitor: paused, note: "No external probe answers (gamedig needs the REST API, A2S on 27015 is silent); monitor paused, Docker healthcheck via the feed is the signal"}
 - {name: palworld3-server, label: Palworld 3,     host: Server-Rig, kind: game-udp, port: 8219,  status: live, fn: games, icon: palworld.png, kuma: steam, query: 27017, monitor: paused, note: "Same as Palworld 1; monitor paused"}
 - {name: palworld2-server, label: Palworld 2,     host: Server-Rig, kind: game-udp, port: 8215,  status: retired, fn: games, icon: palworld.png, kuma: none, note: "Exit 137 (WSL memory ceiling), retired 2026-09-15"}
@@ -29,7 +29,7 @@
 # sidecars (never linked)
 - {name: allthemons-backup,    label: AtM backup,      host: Server-Rig, kind: infra, status: live, fn: games, kuma: none, link: false}
 - {name: allthemons-restarter, label: AtM restarter,   host: Server-Rig, kind: infra, status: live, fn: games, kuma: none, link: false}
-- {name: bettermc-backup,      label: BMC backup,      host: Server-Rig, kind: infra, status: live, fn: games, kuma: none, link: false}
+- {name: bettermc-backup,      label: BMC backup,      host: Server-Rig, kind: infra, status: paused, fn: games, kuma: none, link: false, note: "Parked 2026-10-14 with bettermc-mc (depends_on service_healthy; nothing to back up)"}
 - {name: create-backup,        label: Create backup,   host: Server-Rig, kind: infra, status: live, fn: games, kuma: none, link: false}
 - {name: cobblemon-backup,     label: Cobblemon backup, host: Server-Rig, kind: infra, status: live, fn: games, kuma: none, link: false}
 
@@ -70,7 +70,7 @@
 - {name: npm,                 label: Nginx Proxy Manager, host: nginx-vm, kind: http, url: "http://192.168.1.106:40081", port: 40081, status: live, fn: infra, icon: nginx-proxy-manager.png, kuma: http}
 - {name: npm-https,           label: NPM ingress,    host: nginx-vm, kind: tcp,  port: 40443, status: live, fn: infra, kuma: port, link: false}
 - {name: udm,                 label: UniFi (UDM Pro), host: udm,     kind: http, url: "https://192.168.1.1",        port: 443,   status: live, fn: infra, icon: unifi.png, kuma: http}
-- {name: scrypted,            label: Scrypted,       host: scrypted,      kind: http, url: "https://192.168.1.61:10443", port: 10443, status: live, fn: family, icon: scrypted.png, kuma: http, note: "LXC 10443 at 192.168.1.61; camera hub"}
+- {name: scrypted,            label: Scrypted,       host: scrypted,      kind: http, url: "https://192.168.1.61:10443", port: 10443, status: retired, fn: family, icon: scrypted.png, kuma: none, note: "Retired 2026-10-04: replaced by Home Assistant (VM 1006). LXC stopped, delete after 2026-11-04"}
 - {name: rustdesk,            label: RustDesk server, host: rustdesk,     kind: tcp,  port: 21116, status: live, fn: infra, icon: rustdesk.png, kuma: port, link: false, note: "LXC 102 at 192.168.1.183; not fully configured"}
 
 # ---------------------------------------------------------------- business

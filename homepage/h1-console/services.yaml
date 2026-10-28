@@ -46,10 +46,6 @@
         icon: minecraft.png
         description: 192.168.1.5:25572
         widget: { type: minecraft, url: udp://192.168.1.5:25572 }
-    - Better MC 4:
-        icon: minecraft.png
-        description: 192.168.1.5:25573
-        widget: { type: minecraft, url: udp://192.168.1.5:25573 }
     - Create:
         icon: minecraft.png
         description: 192.168.1.5:25574
@@ -309,6 +305,9 @@
         href: https://analytics.alwaysbookit.com
 
 - Paused & Retired:
+    - Better MC 4:
+        icon: minecraft.png
+        description: paused 2026-10-14 · healthcheck stuck unhealthy
     - Hytale:
         icon: mdi-gamepad-variant
         description: paused · exit 143, 12 days · kids may want it back

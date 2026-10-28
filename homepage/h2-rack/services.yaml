@@ -100,10 +100,6 @@
         icon: minecraft.png
         description: 192.168.1.5:25572
         widget: { type: minecraft, url: udp://192.168.1.5:25572 }
-    - Better MC 4:
-        icon: minecraft.png
-        description: 192.168.1.5:25573
-        widget: { type: minecraft, url: udp://192.168.1.5:25573 }
     - Create:
         icon: minecraft.png
         description: 192.168.1.5:25574
@@ -248,6 +244,9 @@
         siteMonitor: https://192.168.1.61:10443
 
 - Paused & Retired:
+    - Better MC 4:
+        icon: minecraft.png
+        description: paused 2026-10-14 · healthcheck
     - Hytale:
         icon: mdi-gamepad-variant
         description: paused · exit 143

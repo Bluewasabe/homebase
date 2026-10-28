@@ -73,11 +73,11 @@ window.HB_SERVICES = [
   "host": "Server-Rig",
   "kind": "game-mc",
   "port": 25573,
-  "status": "live",
+  "status": "paused",
   "fn": "games",
   "icon": "minecraft.png",
   "kuma": "gamedig:minecraft",
-  "note": "Reports unhealthy 2026-09-15"
+  "note": "Parked 2026-10-14 by Chris: Docker healthcheck stuck unhealthy since 2026-09-15 while the server itself was fine. restart=no + compose profiles:[disabled]. See healthwatch/DOWNTIME.md"
  },
  {
   "name": "create-mc",
@@ -99,7 +99,8 @@ window.HB_SERVICES = [
   "status": "live",
   "fn": "games",
   "icon": "minecraft.png",
-  "kuma": "gamedig:minecraftbe"
+  "kuma": "port",
+  "note": "NetherNet since 2026-10-10: TCP signaling on 19132, UDP 19140-19149"
  },
  {
   "name": "bedrock-creative",
@@ -110,7 +111,8 @@ window.HB_SERVICES = [
   "status": "live",
   "fn": "games",
   "icon": "minecraft.png",
-  "kuma": "gamedig:minecraftbe"
+  "kuma": "port",
+  "note": "NetherNet since 2026-10-10: TCP signaling on 19134, UDP 19150-19159"
  },
  {
   "name": "palworld-server",
@@ -189,10 +191,11 @@ window.HB_SERVICES = [
   "label": "BMC backup",
   "host": "Server-Rig",
   "kind": "infra",
-  "status": "live",
+  "status": "paused",
   "fn": "games",
   "kuma": "none",
-  "link": false
+  "link": false,
+  "note": "Parked 2026-10-14 with bettermc-mc (depends_on service_healthy; nothing to back up)"
  },
  {
   "name": "create-backup",
@@ -611,11 +614,11 @@ window.HB_SERVICES = [
   "kind": "http",
   "url": "https://192.168.1.61:10443",
   "port": 10443,
-  "status": "live",
+  "status": "retired",
   "fn": "family",
   "icon": "scrypted.png",
-  "kuma": "http",
-  "note": "LXC 10443 at 192.168.1.61; camera hub"
+  "kuma": "none",
+  "note": "Retired 2026-10-04: replaced by Home Assistant (VM 1006). LXC stopped, delete after 2026-11-04"
  },
  {
   "name": "rustdesk",

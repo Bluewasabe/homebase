@@ -7,6 +7,8 @@ Runs a real status handshake (mcstatus), so a port that accepts TCP but never
 answers (the AtM zombie of 2026-09-02) reads offline here.
 """
 import json
+import socket
+import time
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -24,9 +26,27 @@ def java(host, port):
 
 
 def bedrock(host, port):
-    s = BedrockServer(host, port, timeout=TIMEOUT).status()
-    return {"online": True, "players": s.players.online, "max": s.players.max,
-            "version": s.version.name, "latency": round(s.latency), "sample": []}
+    try:
+        s = BedrockServer(host, port, timeout=TIMEOUT).status()
+        return {"online": True, "players": s.players.online, "max": s.players.max,
+                "version": s.version.name, "latency": round(s.latency), "sample": []}
+    except Exception:
+        return nethernet(host, port)
+
+
+def nethernet(host, port):
+    """Bedrock 1.26.52+ accepts only the NetherNet transport: HTTP signaling on server-port (TCP),
+    then WebRTC/UDP gameplay. RakNet pings go unanswered, so check that the signaling endpoint
+    speaks HTTP. There's no player count on this path, so players/max read 0/0."""
+    t0 = time.monotonic()
+    with socket.create_connection((host, port), timeout=TIMEOUT) as c:
+        c.settimeout(TIMEOUT)
+        c.sendall(f"GET / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n".encode())
+        head = c.recv(16)
+    if not head.startswith(b"HTTP/"):
+        raise ConnectionError("no NetherNet signaling reply")
+    return {"online": True, "players": 0, "max": 0, "version": "NetherNet",
+            "latency": round((time.monotonic() - t0) * 1000), "sample": []}
 
 
 class H(BaseHTTPRequestHandler):

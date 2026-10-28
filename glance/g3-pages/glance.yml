@@ -105,7 +105,7 @@ pages:
                   - { title: "ATM 10 · :25568", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
                   - { title: "Dragons · :25571", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
                   - { title: "Cobblemon · :25572", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
-                  - { title: "Better MC 4 · :25573", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
+                  - { title: "Better MC 4 (paused)", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
                   - { title: "Create · :25574", url: "http://192.168.1.141:3001/status/homelab", icon: di:minecraft }
               - title: Connect (other)
                 links:
